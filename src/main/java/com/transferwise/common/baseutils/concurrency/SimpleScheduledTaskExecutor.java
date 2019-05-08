@@ -109,7 +109,7 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
             }
             LockUtils.withLock(stateLock, () -> {
                 ExceptionUtils.runUnchecked(() -> {
-                    stateCondition.await(start - currentTimeMillis() + waitTime.toMillis(), TimeUnit.MILLISECONDS);
+                    boolean ignored = stateCondition.await(start - currentTimeMillis() + waitTime.toMillis(), TimeUnit.MILLISECONDS);
                 });
             });
         }
@@ -184,7 +184,7 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
                         }
                         LockUtils.withLock(stateLock, () -> {
                             ExceptionUtils.runUnchecked(() -> {
-                                stateCondition.await(start - taskExecutor.currentTimeMillis() + waitTime.toMillis(), TimeUnit.MILLISECONDS);
+                                boolean ignored = stateCondition.await(start - taskExecutor.currentTimeMillis() + waitTime.toMillis(), TimeUnit.MILLISECONDS);
                             });
                         });
                     }
@@ -243,6 +243,19 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
         @Override
         public int compareTo(Delayed o) {
             return Long.compare(nextExecutionTime, ((ScheduledTask) o).nextExecutionTime);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Delayed) {
+                return compareTo((Delayed) o) == 0;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Long.hashCode(nextExecutionTime);
         }
 
         protected boolean stopRequested() {

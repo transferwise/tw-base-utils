@@ -9,10 +9,18 @@ import java.util.concurrent.Callable;
 
 @UtilityClass
 public class ExceptionUtils {
+    @Deprecated
+    /**
+     * @deprecated Use doUnchecked
+     */
     public static <T> T callUnchecked(Callable<T> callable) {
         return doUnchecked(callable);
     }
 
+    @Deprecated
+    /**
+     * @deprecated Use doUnchecked
+     */
     public static void runUnchecked(RunnableWithException runnable) {
         try {
             runnable.run();

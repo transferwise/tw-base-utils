@@ -1,8 +1,6 @@
-package com.transferwise.common.concurrency;
+package com.transferwise.common.baseutils.concurrency;
 
 import com.transferwise.common.baseutils.clock.TestClock;
-import com.transferwise.common.baseutils.concurrency.ScheduledTaskExecutor;
-import com.transferwise.common.baseutils.concurrency.SimpleScheduledTaskExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Ignore;
 import org.junit.Test;

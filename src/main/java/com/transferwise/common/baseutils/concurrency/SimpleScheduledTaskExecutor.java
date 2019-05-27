@@ -75,7 +75,7 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
 
         executorService.submit(() -> {
             while (!stopRequested) {
-                ScheduledTask scheduledTask = ExceptionUtils.callUnchecked(() -> taskQueue.poll(tick.toMillis(), TimeUnit.MILLISECONDS));
+                ScheduledTask scheduledTask = ExceptionUtils.doUnchecked(() -> taskQueue.poll(tick.toMillis(), TimeUnit.MILLISECONDS));
                 if (scheduledTask != null && !stopRequested) {
                     executorService.submit(scheduledTask::execute);
                 }
@@ -103,7 +103,7 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
             if (hasStopped()) {
                 return true;
             }
-            LockUtils.withLock(stateLock, () -> ExceptionUtils.runUnchecked(() -> {
+            LockUtils.withLock(stateLock, () -> ExceptionUtils.doUnchecked(() -> {
                 boolean ignored = stateCondition.await(start - currentTimeMillis() + waitTime.toMillis(), TimeUnit.MILLISECONDS);
             }));
         }
@@ -176,7 +176,7 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
                         if (hasStopped()) {
                             return true;
                         }
-                        LockUtils.withLock(stateLock, () -> ExceptionUtils.runUnchecked(() -> {
+                        LockUtils.withLock(stateLock, () -> ExceptionUtils.doUnchecked(() -> {
                             boolean ignored = stateCondition.await(start - taskExecutor.currentTimeMillis() + waitTime.toMillis(), TimeUnit.MILLISECONDS);
                         }));
                     }

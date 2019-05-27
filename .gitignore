@@ -1,9 +1,5 @@
 .gradle
 build/
 out/
-target/
 
 .idea
-*.iws
-*.iml
-*.ipr

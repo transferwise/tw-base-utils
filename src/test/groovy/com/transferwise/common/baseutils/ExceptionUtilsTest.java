@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.Callable;
 
-import static com.transferwise.common.baseutils.ExceptionUtils.callUnchecked;
+import static com.transferwise.common.baseutils.ExceptionUtils.doUnchecked;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
@@ -21,37 +21,37 @@ public class ExceptionUtilsTest {
         Error myError = new Error("Memory leak.");
         String myString = "Hello World!";
         //When
-        String result = callUnchecked(() -> myString);
+        String result = doUnchecked(() -> myString);
         //Then
         assertEquals(myString, result);
         //When
-        Throwable t = catchAndReturn(() -> callUnchecked(() -> {
+        Throwable t = catchAndReturn(() -> doUnchecked(() -> {
             throw myRe;
         }));
         //Then
         assertSame(myRe, t);
         //When
-        t = catchAndReturn(() -> callUnchecked(() -> {
+        t = catchAndReturn(() -> doUnchecked(() -> {
             throw myError;
         }));
         //Then
         assertSame(myError, t);
         //When
-        t = catchAndReturn(() -> callUnchecked(() -> {
+        t = catchAndReturn(() -> doUnchecked(() -> {
             throw new UndeclaredThrowableException(myT);
         }));
         //Then
         assertEquals(RuntimeException.class, t.getClass());
         assertSame(myT, t.getCause()); // Is cause wrapped out from UndeclaredThrowableException.
         //When
-        t = catchAndReturn(() -> callUnchecked(() -> {
+        t = catchAndReturn(() -> doUnchecked(() -> {
             throw new InvocationTargetException(myT);
         }));
         //Then
         assertEquals(RuntimeException.class, t.getClass());
         assertSame(myT, t.getCause()); // Is cause wrapped out from UndeclaredThrowableException.
         //When
-        t = catchAndReturn(() -> callUnchecked(() -> {
+        t = catchAndReturn(() -> doUnchecked(() -> {
             duckTapersDoingSneakyStuff(myT);
             return null;
         }));

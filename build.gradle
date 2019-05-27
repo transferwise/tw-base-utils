@@ -1,3 +1,5 @@
+import com.github.spotbugs.SpotBugsTask
+
 plugins {
     id "net.researchgate.release" version "2.8.0"
     id 'java-library'
@@ -111,7 +113,7 @@ test {
     }
 }
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
+tasks.withType(SpotBugsTask) {
     effort = "max"
     
     reports {

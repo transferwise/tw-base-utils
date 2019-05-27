@@ -14,6 +14,7 @@ public interface ScheduledTaskExecutor {
 	interface TaskHandle {
 		void stop();
 		boolean hasStopped();
+		@SuppressWarnings("UnusedReturnValue")
 		boolean waitUntilStopped(Duration waitTime);
 		boolean isWorking();
 	}

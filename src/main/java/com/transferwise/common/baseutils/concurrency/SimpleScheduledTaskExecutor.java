@@ -75,11 +75,9 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
 
         executorService.submit(() -> {
             while (!stopRequested) {
-                ScheduledTask scheduledTask = ExceptionUtils.callUnchecked(() -> {
-                    return taskQueue.poll(tick.toMillis(), TimeUnit.MILLISECONDS);
-                });
+                ScheduledTask scheduledTask = ExceptionUtils.callUnchecked(() -> taskQueue.poll(tick.toMillis(), TimeUnit.MILLISECONDS));
                 if (scheduledTask != null && !stopRequested) {
-                    executorService.submit(() -> scheduledTask.execute());
+                    executorService.submit(scheduledTask::execute);
                 }
             }
         });
@@ -95,9 +93,7 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
 
     @Override
     public boolean hasStopped() {
-        return LockUtils.withLock(stateLock, () -> {
-            return stopRequested && workingTasksCount.get() == 0;
-        });
+        return LockUtils.withLock(stateLock, () -> stopRequested && workingTasksCount.get() == 0);
     }
 
     @Override
@@ -107,11 +103,9 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
             if (hasStopped()) {
                 return true;
             }
-            LockUtils.withLock(stateLock, () -> {
-                ExceptionUtils.runUnchecked(() -> {
-                    boolean ignored = stateCondition.await(start - currentTimeMillis() + waitTime.toMillis(), TimeUnit.MILLISECONDS);
-                });
-            });
+            LockUtils.withLock(stateLock, () -> ExceptionUtils.runUnchecked(() -> {
+                boolean ignored = stateCondition.await(start - currentTimeMillis() + waitTime.toMillis(), TimeUnit.MILLISECONDS);
+            }));
         }
         return hasStopped();
     }
@@ -182,11 +176,9 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
                         if (hasStopped()) {
                             return true;
                         }
-                        LockUtils.withLock(stateLock, () -> {
-                            ExceptionUtils.runUnchecked(() -> {
-                                boolean ignored = stateCondition.await(start - taskExecutor.currentTimeMillis() + waitTime.toMillis(), TimeUnit.MILLISECONDS);
-                            });
-                        });
+                        LockUtils.withLock(stateLock, () -> ExceptionUtils.runUnchecked(() -> {
+                            boolean ignored = stateCondition.await(start - taskExecutor.currentTimeMillis() + waitTime.toMillis(), TimeUnit.MILLISECONDS);
+                        }));
                     }
                     return hasStopped();
                 }
@@ -199,16 +191,14 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
         }
 
         private void execute() {
-            if (!LockUtils.withLock(taskExecutor.stateLock, () -> {
-                return LockUtils.withLock(stateLock, () -> {
-                    if (stopRequested()) {
-                        return false;
-                    }
-                    working = true;
-                    taskExecutor.workingTasksCount.incrementAndGet();
-                    return true;
-                });
-            })) {
+            if (!LockUtils.withLock(taskExecutor.stateLock, () -> LockUtils.withLock(stateLock, () -> {
+                if (stopRequested()) {
+                    return false;
+                }
+                working = true;
+                taskExecutor.workingTasksCount.incrementAndGet();
+                return true;
+            }))) {
                 return;
             }
 

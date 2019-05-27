@@ -83,7 +83,7 @@ public class ThreadNamingExecutorServiceWrapper implements ExecutorService {
 	}
 
 	private <T> Collection<? extends Callable<T>> wrap(Collection<? extends Callable<T>> tasks){
-		return tasks.stream().map((task)-> wrap(task)).collect(Collectors.toList());
+		return tasks.stream().map(this::wrap).collect(Collectors.toList());
 	}
 
 	protected <T> Callable<T> wrap(Callable<T> delegate){

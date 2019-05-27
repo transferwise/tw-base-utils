@@ -90,7 +90,7 @@ public class TransactionsHelper implements ITransactionsHelper {
 
         @Override
         public <T> T call(Callable<T> callable) {
-            return ExceptionUtils.callUnchecked(() -> {
+            return ExceptionUtils.doUnchecked(() -> {
                 DefaultTransactionDefinition def = new DefaultTransactionDefinition();
                 if (propagation != null) {
                     def.setPropagationBehavior(propagation.value());

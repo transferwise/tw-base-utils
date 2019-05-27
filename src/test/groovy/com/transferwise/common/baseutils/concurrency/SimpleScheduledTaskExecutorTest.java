@@ -13,8 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @Slf4j
 public class SimpleScheduledTaskExecutorTest {
@@ -25,9 +24,7 @@ public class SimpleScheduledTaskExecutorTest {
         SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService);
         scheduledTaskExecutor.start();
 
-        ScheduledTaskExecutor.TaskHandle taskHandler = scheduledTaskExecutor.scheduleAtFixedInterval(() -> {
-            System.out.println("Working");
-        }, Duration.ofSeconds(1), Duration.ofSeconds(2));
+        ScheduledTaskExecutor.TaskHandle taskHandler = scheduledTaskExecutor.scheduleAtFixedInterval(() -> System.out.println("Working"), Duration.ofSeconds(1), Duration.ofSeconds(2));
 
         Thread.sleep(10000);
 
@@ -47,9 +44,7 @@ public class SimpleScheduledTaskExecutorTest {
         SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService);
         scheduledTaskExecutor.start();
 
-        ScheduledTaskExecutor.TaskHandle taskHandler = scheduledTaskExecutor.scheduleOnce(() -> {
-            System.out.println("Working");
-        }, Duration.ofSeconds(1));
+        ScheduledTaskExecutor.TaskHandle taskHandler = scheduledTaskExecutor.scheduleOnce(() -> System.out.println("Working"), Duration.ofSeconds(1));
 
         Thread.sleep(10000);
 
@@ -75,25 +70,25 @@ public class SimpleScheduledTaskExecutorTest {
         String resultKey = "myTask";
         ScheduledTaskExecutor.TaskHandle taskHandle = scheduledTaskExecutor.scheduleAtFixedInterval(() -> {
             if (results.get(resultKey) == null) {
-                results.put(resultKey, 1l);
+                results.put(resultKey, 1L);
             } else {
                 results.put(resultKey, results.get(resultKey) + 1);
             }
         }, Duration.ofSeconds(1), Duration.ofSeconds(2));
 
-        assertEquals(results.get(resultKey), null);
+        assertNull(results.get(resultKey));
         testClock.tick(Duration.ofMillis(500));
-        assertEquals(results.get(resultKey), null);
+        assertNull(results.get(resultKey));
         testClock.tick(Duration.ofMillis(501));
-        await().until(() -> results.containsKey(resultKey) && results.get(resultKey) == 1l && !taskHandle.isWorking());
+        await().until(() -> results.containsKey(resultKey) && results.get(resultKey) == 1L && !taskHandle.isWorking());
         testClock.tick(Duration.ofMillis(2001));
-        await().until(() -> results.get(resultKey) == 2l && !taskHandle.isWorking());
+        await().until(() -> results.get(resultKey) == 2L && !taskHandle.isWorking());
 
         taskHandle.stop();
         taskHandle.waitUntilStopped(Duration.ofMillis(2000));
         assertTrue(taskHandle.hasStopped());
         testClock.tick(Duration.ofMillis(2001));
-        assertTrue(results.get(resultKey) == 2l);
+        assertEquals(2L, (long) results.get(resultKey));
 
         scheduledTaskExecutor.stop();
     }
@@ -113,7 +108,7 @@ public class SimpleScheduledTaskExecutorTest {
             final int idx = i;
             scheduledTaskExecutor.scheduleAtFixedInterval(() -> {
                 if (results.get(idx) == null) {
-                    results.put(idx, 1l);
+                    results.put(idx, 1L);
                 } else {
                     results.put(idx, results.get(idx) + 1);
                 }
@@ -160,7 +155,7 @@ public class SimpleScheduledTaskExecutorTest {
         String resultKey = "myTask";
         ScheduledTaskExecutor.TaskHandle taskHandle = scheduledTaskExecutor.scheduleAtFixedInterval(() -> {
             if (results.get(resultKey) == null) {
-                results.put(resultKey, 1l);
+                results.put(resultKey, 1L);
             } else {
                 results.put(resultKey, results.get(resultKey) + 1);
             }
@@ -186,17 +181,17 @@ public class SimpleScheduledTaskExecutorTest {
         String resultKey = "myTask";
         ScheduledTaskExecutor.TaskHandle taskHandle = scheduledTaskExecutor.scheduleOnce(() -> {
             if (results.get(resultKey) == null) {
-                results.put(resultKey, 1l);
+                results.put(resultKey, 1L);
             } else {
                 results.put(resultKey, results.get(resultKey) + 1);
             }
         }, Duration.ofSeconds(1));
 
-        assertEquals(results.get(resultKey), null);
+        assertNull(results.get(resultKey));
         testClock.tick(Duration.ofMillis(500));
-        assertEquals(results.get(resultKey), null);
+        assertNull(results.get(resultKey));
         testClock.tick(Duration.ofMillis(501));
-        await().until(() -> results.containsKey(resultKey) && results.get(resultKey) == 1l && !taskHandle.isWorking());
+        await().until(() -> results.containsKey(resultKey) && results.get(resultKey) == 1L && !taskHandle.isWorking());
 
         assertEquals(0, scheduledTaskExecutor.getTaskQueueSize());
 

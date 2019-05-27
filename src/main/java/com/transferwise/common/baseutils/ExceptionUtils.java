@@ -85,13 +85,13 @@ public class ExceptionUtils {
         while (t != null) {
             sb.append(t.toString());
             if (stacksCount > 0) {
-                StackTraceElement[] stes = t.getStackTrace();
-                int count = Math.min(stacksCount, stes.length);
+                StackTraceElement[] stackTraceElement = t.getStackTrace();
+                int count = Math.min(stacksCount, stackTraceElement.length);
                 for (int i = 0; i < count; i++) {
                     sb.append("\n");
-                    sb.append(stes[i].toString());
+                    sb.append(stackTraceElement[i].toString());
                 }
-                if (stes.length > count) {
+                if (stackTraceElement.length > count) {
                     sb.append("\n...");
                 }
             }

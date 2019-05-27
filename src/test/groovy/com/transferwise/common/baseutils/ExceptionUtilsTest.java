@@ -68,7 +68,7 @@ public class ExceptionUtilsTest {
     private Throwable catchAndReturn(Callable callable) {
         try {
             callable.call();
-            throw new IllegalStateException("Who is the captain of this failboat?");
+            throw new IllegalStateException("Who is the captain of this fail boat?");
         } catch (Throwable t) {
             return t;
         }

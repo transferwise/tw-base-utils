@@ -1,5 +1,8 @@
 # TransferWise Base Utils.
 
+![Apache 2](https://img.shields.io/hexpm/l/plug.svg)
+![Java 1.8](https://img.shields.io/badge/Java-1.8-blue.svg)
+
 Generic, TransferWise domain independent base utils.
 
 Should be kept TransferWise domain-free.

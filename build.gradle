@@ -76,8 +76,8 @@ publishing {
             artifact sourcesJar
 
             pom {
-                name = 'TW Gaffer JTA'
-                description = 'Transferwise Gaffer JTA - efficient 1PC JTA for enterprise services'
+                name = 'TransferWise Base Utils'
+                description = 'TransferWise Base Utils'
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0, Copyright 2019 TransferWise Ltd'

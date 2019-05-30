@@ -4,6 +4,7 @@ plugins {
     id "net.researchgate.release" version "2.8.0"
     id 'java-library'
     id 'maven-publish'
+    id 'signing'
     id 'groovy'
     id 'com.github.spotbugs' version '1.7.1'
     id 'io.spring.dependency-management' version '1.0.7.RELEASE'
@@ -69,15 +70,35 @@ task sourcesJar(type: Jar) {
     archiveClassifier = 'sources'
 }
 
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+            afterEvaluate {
+                artifactId = "tw-base-utils"
+            }
+            
             artifact sourcesJar
+            artifact javadocJar
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
 
             pom {
                 name = 'TransferWise Base Utils'
                 description = 'TransferWise Base Utils'
+                url = 'https://github.com/transferwise/tw-base-utils'
+                packaging = "jar"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0, Copyright 2019 TransferWise Ltd'
@@ -88,18 +109,44 @@ publishing {
                     developer {
                         id = 'onukristo'
                         name = 'Kristo Kuusküll'
+                        email = "kristo.kuuskull@transferwise.com"
+                        organization = "Transferwise Ltd"
+                        organizationUrl = "https://github.com/transferwise"
                     }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/transferwise/tw-base-utils.git'
+                    developerConnection = 'scm:git:ssh://github.com:transferwise/tw-base-utils.git'
+                    url = 'https://github.com/transferwise/tw-base-utils'
                 }
             }
         }
     }
 
+    signing {
+        sign publishing.publications.mavenJava
+    }
+
+    javadoc {
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+    }
+
     repositories {
+        /*
         maven {
             url "https://arti.tw.ee/artifactory/libs-${project.version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release'}-local"
             credentials {
                 username = artifactoryUser
                 password = artifactoryPassword
+            }
+        }*/
+        maven {
+            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            credentials {
+                username sonatypeUsername
+                password sonatypePassword
             }
         }
     }
@@ -115,7 +162,7 @@ test {
 
 tasks.withType(SpotBugsTask) {
     effort = "max"
-    
+
     reports {
         xml.enabled false
         html.enabled true

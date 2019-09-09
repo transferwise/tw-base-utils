@@ -107,7 +107,7 @@ public class DiscardingQueueProcessor<T, K> {
                 genericLock.lock();
                 try {
                     while (queue.peek() == null && !stopRequested.get()) {
-                        genericCondition.await(5, TimeUnit.SECONDS);
+                        boolean ignored = genericCondition.await(5, TimeUnit.SECONDS);
                     }
 
                     Payload<K> payload = queue.poll();
@@ -117,7 +117,7 @@ public class DiscardingQueueProcessor<T, K> {
                         return;
                     }
                     while (concurrency.get() >= maxConcurrency) {
-                        genericCondition.await(5, TimeUnit.SECONDS);
+                        boolean ignored = genericCondition.await(5, TimeUnit.SECONDS);
                     }
 
                     concurrency.incrementAndGet();

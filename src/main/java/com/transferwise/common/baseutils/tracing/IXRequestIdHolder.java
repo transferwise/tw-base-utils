@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 import static java.lang.Character.isLetterOrDigit;
 
 public interface IXRequestIdHolder {
+    int MAX_REQUEST_ID_LENGTH = 36;
 
     String generate();
 
@@ -25,7 +26,7 @@ public interface IXRequestIdHolder {
     void with(Object o, RunnableWithException runnable);
 
     static boolean isValidRequestId(String requestId) {
-        if (requestId == null || requestId.length() > 36) {
+        if (requestId == null || requestId.length() > MAX_REQUEST_ID_LENGTH) {
             return false;
         }
 

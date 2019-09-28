@@ -41,111 +41,111 @@ public class DiscardingQueueProcessorSpec extends Specification {
 
     def "processing a single event works"() {
         when:
-            processor.schedule("Hello TransferWise!")
-            await().until() {
-                results.size() == 1
-            }
+        processor.schedule("Hello TransferWise!")
+        await().until() {
+            results.size() == 1
+        }
         then:
-            results[0] == "Hello TransferWise!"
+        results[0] == "Hello TransferWise!"
         when:
-            processor.schedule("Hi")
-            await().until {
-                results.size() == 2
-            }
+        processor.schedule("Hi")
+        await().until {
+            results.size() == 2
+        }
         then:
-            results[1] == "Hi"
+        results[1] == "Hi"
     }
 
     def "soft queue size will discard similar messages"() {
         when:
-            CountDownLatch latch = new CountDownLatch(20)
+        CountDownLatch latch = new CountDownLatch(20)
 
-            processor.processor = { payload ->
-                latch.await()
-                results.add(payload.data)
+        processor.processor = { payload ->
+            latch.await()
+            results.add(payload.data)
+        }
+
+        processor.setSoftLimitPredicate({ data -> true })
+
+        int softDiscardedCount = 0
+        20.times {
+            def result = processor.schedule("${it}")
+            if (!result.scheduled && result.discardReason == DiscardingQueueProcessor.DiscardReason.SOFT_LIMIT) {
+                softDiscardedCount++
             }
+            latch.countDown()
+        }
 
-            processor.setSoftLimitPredicate({ data -> true })
-
-            int softDiscardedCount = 0
-            20.times {
-                def result = processor.schedule("${it}")
-                if (!result.scheduled && result.discardReason == DiscardingQueueProcessor.DiscardReason.SOFT_LIMIT) {
-                    softDiscardedCount++
-                }
-                latch.countDown()
-            }
-
-            await().until() {
-                println(results.size())
-                results.size() == 5
-            }
-        then:
+        await().until() {
+            println(results.size())
             results.size() == 5
-            softDiscardedCount == 15
+        }
+        then:
+        results.size() == 5
+        softDiscardedCount == 15
     }
 
     def "hard queue limit is applied"() {
         when:
-            CountDownLatch latch = new CountDownLatch(20)
+        CountDownLatch latch = new CountDownLatch(20)
 
-            processor.processor = { payload ->
-                latch.await()
-                results.add(payload.data)
-            }
+        processor.processor = { payload ->
+            latch.await()
+            results.add(payload.data)
+        }
 
-            processor.setSoftLimitPredicate({ data -> false })
+        processor.setSoftLimitPredicate({ data -> false })
 
-            20.times {
-                processor.schedule("${it}")
-                latch.countDown()
-            }
+        20.times {
+            processor.schedule("${it}")
+            latch.countDown()
+        }
 
-            await().until() {
-                results.size() == 10
-            }
-        then:
+        await().until() {
             results.size() == 10
+        }
+        then:
+        results.size() == 10
     }
 
     def "processor errors will not stop processing"() {
         when:
-            CountDownLatch latch = new CountDownLatch(20)
+        CountDownLatch latch = new CountDownLatch(20)
 
-            processor.processor = { payload ->
-                latch.await()
-                throw new Exception("Bad Things Do Happen");
-            }
+        processor.processor = { payload ->
+            latch.await()
+            throw new Exception("Bad Things Do Happen");
+        }
 
-            20.times {
-                processor.schedule("${it}")
-                latch.countDown()
-            }
+        20.times {
+            processor.schedule("${it}")
+            latch.countDown()
+        }
 
-            await().until({
-                errors.size() == 10
-            })
-        then:
-            results.size() == 0
+        await().until({
             errors.size() == 10
-            errors[0].getMessage() == "Bad Things Do Happen"
-        when:
-            latch = new CountDownLatch(20)
-            processor.processor = { payload ->
-                latch.await()
-                results.add(payload.data)
-            }
-
-            20.times {
-                processor.schedule("${it}")
-                latch.countDown()
-            }
-
-            await().until() {
-                results.size() == 10
-            }
+        })
         then:
+        results.size() == 0
+        errors.size() == 10
+        errors[0].getMessage() == "Bad Things Do Happen"
+        when:
+        latch = new CountDownLatch(20)
+        processor.processor = { payload ->
+            latch.await()
+            results.add(payload.data)
+        }
+
+        20.times {
+            processor.schedule("${it}")
+            latch.countDown()
+        }
+
+        await().until() {
             results.size() == 10
+        }
+        then:
+        results.size() == 10
     }
 
 }

@@ -16,6 +16,7 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.*;
 
 @Slf4j
+@SuppressWarnings({"checkstyle:MagicNumber", "checkstyle:MultipleStringLiterals"})
 public class SimpleScheduledTaskExecutorTest {
     @Test
     @Ignore("This test is for manual tweaking.")
@@ -64,8 +65,11 @@ public class SimpleScheduledTaskExecutorTest {
 
         ExecutorService executorService = Executors.newCachedThreadPool();
         SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService).setTick(Duration.ofMillis(5))
-                .setClock(testClock);
+            .setClock(testClock);
         scheduledTaskExecutor.start();
+
+        // For a bug where this created never-released lock.
+        assertFalse(scheduledTaskExecutor.hasStopped());
 
         String resultKey = "myTask";
         ScheduledTaskExecutor.TaskHandle taskHandle = scheduledTaskExecutor.scheduleAtFixedInterval(() -> {
@@ -75,6 +79,8 @@ public class SimpleScheduledTaskExecutorTest {
                 results.put(resultKey, results.get(resultKey) + 1);
             }
         }, Duration.ofSeconds(1), Duration.ofSeconds(2));
+        // For a bug where this created never-released lock.
+        assertFalse(taskHandle.hasStopped());
 
         assertNull(results.get(resultKey));
         testClock.tick(Duration.ofMillis(500));
@@ -101,7 +107,7 @@ public class SimpleScheduledTaskExecutorTest {
 
         ExecutorService executorService = Executors.newCachedThreadPool();
         SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService).setTick(Duration.ofMillis(5))
-                .setClock(testClock);
+            .setClock(testClock);
         scheduledTaskExecutor.start();
 
         for (int i = 0; i < N; i++) {
@@ -175,7 +181,7 @@ public class SimpleScheduledTaskExecutorTest {
 
         ExecutorService executorService = Executors.newCachedThreadPool();
         SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService).setTick(Duration.ofMillis(5))
-                .setClock(testClock);
+            .setClock(testClock);
         scheduledTaskExecutor.start();
 
         String resultKey = "myTask";

@@ -5,6 +5,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
+    id 'checkstyle'
     id 'groovy'
     id 'com.github.spotbugs' version '1.7.1'
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
@@ -134,21 +135,21 @@ publishing {
     }
 
     repositories {
-        /*
         maven {
             url "https://arti.tw.ee/artifactory/libs-${project.version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release'}-local"
             credentials {
                 username = artifactoryUser
                 password = artifactoryPassword
             }
-        }*/
+        }
+        /*
         maven {
             url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
             credentials {
                 username sonatypeUsername
                 password sonatypePassword
             }
-        }
+        }*/
     }
 }
 

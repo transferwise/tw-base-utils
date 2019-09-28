@@ -6,7 +6,7 @@ import static org.junit.Assert.assertEquals;
 
 public class MdcXRequestIdHolderTest {
     private final MdcXRequestIdHolder mdcXRequestIdHolder = new MdcXRequestIdHolder();
-    
+
     @Test
     public void testValidity() {
         testValidity(null, false);

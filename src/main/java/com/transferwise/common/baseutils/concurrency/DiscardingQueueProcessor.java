@@ -23,6 +23,8 @@ import java.util.function.Predicate;
 @Slf4j
 @Accessors(chain = true)
 public class DiscardingQueueProcessor<T, K> {
+    private final int SMALL_TIME_INTERVAL_S = 5;
+
     @Setter
     /**
      * If returns `true`, the soft limit will be applied.
@@ -42,8 +44,10 @@ public class DiscardingQueueProcessor<T, K> {
     @Setter
     private int maxConcurrency = Runtime.getRuntime().availableProcessors();
     @Setter
+    @SuppressWarnings("checkstyle:MagicNumber")
     private int hardQueueLimit = 2000;
     @Setter
+    @SuppressWarnings("checkstyle:MagicNumber")
     private int softQueueLimit = 500;
     @Setter
     private Duration queueTimeout;
@@ -107,7 +111,7 @@ public class DiscardingQueueProcessor<T, K> {
                 genericLock.lock();
                 try {
                     while (queue.peek() == null && !stopRequested.get()) {
-                        boolean ignored = genericCondition.await(5, TimeUnit.SECONDS);
+                        boolean ignored = genericCondition.await(SMALL_TIME_INTERVAL_S, TimeUnit.SECONDS);
                     }
 
                     Payload<K> payload = queue.poll();
@@ -117,7 +121,7 @@ public class DiscardingQueueProcessor<T, K> {
                         return;
                     }
                     while (concurrency.get() >= maxConcurrency) {
-                        boolean ignored = genericCondition.await(5, TimeUnit.SECONDS);
+                        boolean ignored = genericCondition.await(SMALL_TIME_INTERVAL_S, TimeUnit.SECONDS);
                     }
 
                     concurrency.incrementAndGet();

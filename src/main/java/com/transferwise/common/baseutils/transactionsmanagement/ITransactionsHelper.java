@@ -9,11 +9,11 @@ import java.util.concurrent.Callable;
  * We will not follow old J2EE logic about RuntimeExceptions vs CheckedExceptions and rollback on any exception.
  */
 public interface ITransactionsHelper {
-	boolean isRollbackOnly();
+    boolean isRollbackOnly();
 
-	void markAsRollbackOnly();
+    void markAsRollbackOnly();
 
-	IBuilder withTransaction();
+    IBuilder withTransaction();
 
     interface IBuilder {
         IBuilder withPropagation(Propagation propagation);

@@ -18,6 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
     private ExecutorService executorService;
     private DelayQueue<ScheduledTask> taskQueue;
+    @SuppressWarnings("checkstyle:MagicNumber")
     private Duration tick = Duration.ofMillis(50);
     private Clock clock;
     private Lock stateLock;
@@ -163,10 +164,7 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
 
                 @Override
                 public boolean hasStopped() {
-                    return LockUtils.withLock(stateLock, () -> {
-                        stateLock.lock();
-                        return stopRequested() && !working;
-                    });
+                    return LockUtils.withLock(stateLock, () -> stopRequested() && !working);
                 }
 
                 @Override

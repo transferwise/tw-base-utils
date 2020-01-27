@@ -3,7 +3,7 @@ import com.github.spotbugs.SpotBugsTask
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'signing'
+   // id 'signing'
     id 'checkstyle'
     id 'groovy'
     id "com.github.spotbugs" version "3.0.0"
@@ -116,9 +116,11 @@ publishing {
         }
     }
 
+/*
     signing {
         sign publishing.publications.mavenJava
     }
+*/
 
     javadoc {
         if (JavaVersion.current().isJava9Compatible()) {

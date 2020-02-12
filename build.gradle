@@ -1,176 +1,36 @@
-import com.github.spotbugs.SpotBugsTask
+buildscript {
+    repositories {
+        maven {
+            setUrl("https://arti.tw.ee/artifactory/plugins-release")
+        }
+        mavenLocal()
+    }
+}
 
 plugins {
-    id 'java-library'
-    id 'maven-publish'
-   // id 'signing'
-    id 'checkstyle'
-    id 'groovy'
     id "com.github.spotbugs" version "3.0.0"
-    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id "idea"
 }
 
-group = 'com.transferwise.common'
-
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-
-jar {
-    manifest {
-        attributes(
-            "Implementation-Title": "Transferwise Base Utils",
-            "Implementation-Version": version
-        )
-    }
+idea.project {
+    vcs = 'Git'
+    languageLevel = JavaVersion.VERSION_1_8
+    targetBytecodeVersion = JavaVersion.VERSION_1_8
 }
 
-compileJava {
-    options.encoding = 'utf-8'
-    options.compilerArgs << '-parameters'
-}
+ext.projectName = "TransferWise Base Utils"
+ext.projectDescription = "TransferWise Base Utils"
+ext.projectArtifactName = "tw-base-utils"
 
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.boot:spring-boot-starter-parent:2.1.11.RELEASE"
-    }
-}
+apply from: 'build.common.gradle'
 
 dependencies {
-    annotationProcessor 'org.projectlombok:lombok'
-    compileOnly 'org.projectlombok:lombok'
     compileOnly 'org.springframework.boot:spring-boot-starter'
     compileOnly 'org.springframework:spring-tx'
     implementation 'org.slf4j:slf4j-api'
     implementation 'org.apache.commons:commons-lang3:3.9'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.projectlombok:lombok'
     testImplementation 'junit:junit'
     testImplementation 'org.codehaus.groovy:groovy:2.5.8'
     testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
-    testImplementation 'org.awaitility:awaitility:4.0.1'
+    testImplementation 'org.awaitility:awaitility:4.0.2'
 }
-
-ext.artifactoryUser = project.hasProperty("artifactoryUser") ? project.artifactoryUser : System.env.ARTIFACTORY_USER as String
-ext.artifactoryPassword = project.hasProperty("artifactoryPassword") ? project.artifactoryPassword : System.env.ARTIFACTORY_PASSWORD as String
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
-    archiveClassifier = 'sources'
-}
-
-task javadocJar(type: Jar) {
-    from javadoc
-    archiveClassifier = 'javadoc'
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            afterEvaluate {
-                artifactId = "tw-base-utils"
-            }
-
-            artifact sourcesJar
-            artifact javadocJar
-            versionMapping {
-                usage('java-api') {
-                    fromResolutionOf('runtimeClasspath')
-                }
-                usage('java-runtime') {
-                    fromResolutionResult()
-                }
-            }
-
-            pom {
-                name = 'TransferWise Base Utils'
-                description = 'TransferWise Base Utils'
-                url = 'https://github.com/transferwise/tw-base-utils'
-                packaging = "jar"
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0, Copyright 2019 TransferWise Ltd'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'onukristo'
-                        name = 'Kristo Kuusküll'
-                        email = "kristo.kuuskull@transferwise.com"
-                        organization = "Transferwise Ltd"
-                        organizationUrl = "https://github.com/transferwise"
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git://github.com/transferwise/tw-base-utils.git'
-                    developerConnection = 'scm:git:ssh://github.com:transferwise/tw-base-utils.git'
-                    url = 'https://github.com/transferwise/tw-base-utils'
-                }
-            }
-        }
-    }
-
-/*
-    signing {
-        sign publishing.publications.mavenJava
-    }
-*/
-
-    javadoc {
-        if (JavaVersion.current().isJava9Compatible()) {
-            options.addBooleanOption('html5', true)
-        }
-    }
-
-    repositories {
-        maven {
-            url "https://arti.tw.ee/artifactory/libs-${project.version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release'}-local"
-            credentials {
-                username = artifactoryUser
-                password = artifactoryPassword
-            }
-        }
-        /*maven {
-            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-            credentials {
-                username sonatypeUsername
-                password sonatypePassword
-            }
-        }*/
-    }
-}
-
-test {
-    testLogging {
-        events "passed", "skipped", "failed", "standardError"
-        showStackTraces = true
-        exceptionFormat = 'full'
-    }
-}
-
-tasks.withType(SpotBugsTask) {
-    effort = "max"
-
-    reports {
-        xml.enabled false
-        html.enabled true
-    }
-}
-
-spotbugs {
-    spotbugsTest.enabled = false
-}
-
-task addTag(type: Exec) {
-    commandLine 'git', 'tag', "$project.name-$project.version", '-m', "$project.name-$project.version"
-}
-task pushTag(type: Exec) {
-    commandLine 'git', 'push', 'origin', "$project.name-$project.version"
-}
-pushTag.dependsOn addTag

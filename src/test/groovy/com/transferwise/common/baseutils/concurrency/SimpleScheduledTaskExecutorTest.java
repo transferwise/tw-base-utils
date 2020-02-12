@@ -1,206 +1,210 @@
 package com.transferwise.common.baseutils.concurrency;
 
-import com.transferwise.common.baseutils.clock.TestClock;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.awaitility.Awaitility.await;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import com.transferwise.common.baseutils.clock.TestClock;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.*;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Ignore;
+import org.junit.Test;
 
 @Slf4j
 @SuppressWarnings({"checkstyle:MagicNumber", "checkstyle:MultipleStringLiterals"})
 public class SimpleScheduledTaskExecutorTest {
-    @Test
-    @Ignore("This test is for manual tweaking.")
-    public void testManually() throws InterruptedException {
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService);
-        scheduledTaskExecutor.start();
 
-        ScheduledTaskExecutor.TaskHandle taskHandler = scheduledTaskExecutor.scheduleAtFixedInterval(() -> System.out.println("Working"), Duration.ofSeconds(1), Duration.ofSeconds(2));
+  @Test
+  @Ignore("This test is for manual tweaking.")
+  public void testManually() throws InterruptedException {
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService);
+    scheduledTaskExecutor.start();
 
-        Thread.sleep(10000);
+    ScheduledTaskExecutor.TaskHandle taskHandler = scheduledTaskExecutor
+        .scheduleAtFixedInterval(() -> System.out.println("Working"), Duration.ofSeconds(1), Duration.ofSeconds(2));
 
-        System.out.println("Stopping the task");
-        taskHandler.stop();
+    Thread.sleep(10000);
 
-        Thread.sleep(5000);
+    System.out.println("Stopping the task");
+    taskHandler.stop();
 
-        System.out.println("Stopping the executor.");
-        scheduledTaskExecutor.stop();
-    }
+    Thread.sleep(5000);
 
-    @Test
-    @Ignore("This test is for manual tweaking.")
-    public void testManuallyOnceExecution() throws InterruptedException {
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService);
-        scheduledTaskExecutor.start();
+    System.out.println("Stopping the executor.");
+    scheduledTaskExecutor.stop();
+  }
 
-        ScheduledTaskExecutor.TaskHandle taskHandler = scheduledTaskExecutor.scheduleOnce(() -> System.out.println("Working"), Duration.ofSeconds(1));
+  @Test
+  @Ignore("This test is for manual tweaking.")
+  public void testManuallyOnceExecution() throws InterruptedException {
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService);
+    scheduledTaskExecutor.start();
 
-        Thread.sleep(10000);
+    ScheduledTaskExecutor.TaskHandle taskHandler = scheduledTaskExecutor.scheduleOnce(() -> System.out.println("Working"), Duration.ofSeconds(1));
 
-        System.out.println("Stopping the task");
-        taskHandler.stop();
+    Thread.sleep(10000);
 
-        Thread.sleep(5000);
+    System.out.println("Stopping the task");
+    taskHandler.stop();
 
-        System.out.println("Stopping the executor.");
-        scheduledTaskExecutor.stop();
-    }
+    Thread.sleep(5000);
 
-    @Test
-    public void testHappyFlow() {
-        TestClock testClock = new TestClock();
-        Map<String, Long> results = new ConcurrentHashMap<>();
+    System.out.println("Stopping the executor.");
+    scheduledTaskExecutor.stop();
+  }
 
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService).setTick(Duration.ofMillis(5))
-            .setClock(testClock);
-        scheduledTaskExecutor.start();
+  @Test
+  public void testHappyFlow() {
+    TestClock testClock = new TestClock();
+    Map<String, Long> results = new ConcurrentHashMap<>();
 
-        // For a bug where this created never-released lock.
-        assertFalse(scheduledTaskExecutor.hasStopped());
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService).setTick(Duration.ofMillis(5))
+        .setClock(testClock);
+    scheduledTaskExecutor.start();
 
-        String resultKey = "myTask";
-        ScheduledTaskExecutor.TaskHandle taskHandle = scheduledTaskExecutor.scheduleAtFixedInterval(() -> {
-            if (results.get(resultKey) == null) {
-                results.put(resultKey, 1L);
-            } else {
-                results.put(resultKey, results.get(resultKey) + 1);
-            }
-        }, Duration.ofSeconds(1), Duration.ofSeconds(2));
-        // For a bug where this created never-released lock.
-        assertFalse(taskHandle.hasStopped());
+    // For a bug where this created never-released lock.
+    assertFalse(scheduledTaskExecutor.hasStopped());
 
-        assertNull(results.get(resultKey));
-        testClock.tick(Duration.ofMillis(500));
-        assertNull(results.get(resultKey));
-        testClock.tick(Duration.ofMillis(501));
-        await().until(() -> results.containsKey(resultKey) && results.get(resultKey) == 1L && !taskHandle.isWorking());
-        testClock.tick(Duration.ofMillis(2001));
-        await().until(() -> results.get(resultKey) == 2L && !taskHandle.isWorking());
+    String resultKey = "myTask";
+    ScheduledTaskExecutor.TaskHandle taskHandle = scheduledTaskExecutor.scheduleAtFixedInterval(() -> {
+      if (results.get(resultKey) == null) {
+        results.put(resultKey, 1L);
+      } else {
+        results.put(resultKey, results.get(resultKey) + 1);
+      }
+    }, Duration.ofSeconds(1), Duration.ofSeconds(2));
+    // For a bug where this created never-released lock.
+    assertFalse(taskHandle.hasStopped());
 
-        taskHandle.stop();
-        taskHandle.waitUntilStopped(Duration.ofMillis(2000));
-        assertTrue(taskHandle.hasStopped());
-        testClock.tick(Duration.ofMillis(2001));
-        assertEquals(2L, (long) results.get(resultKey));
+    assertNull(results.get(resultKey));
+    testClock.tick(Duration.ofMillis(500));
+    assertNull(results.get(resultKey));
+    testClock.tick(Duration.ofMillis(501));
+    await().until(() -> results.containsKey(resultKey) && results.get(resultKey) == 1L && !taskHandle.isWorking());
+    testClock.tick(Duration.ofMillis(2001));
+    await().until(() -> results.get(resultKey) == 2L && !taskHandle.isWorking());
 
-        scheduledTaskExecutor.stop();
-    }
+    taskHandle.stop();
+    taskHandle.waitUntilStopped(Duration.ofMillis(2000));
+    assertTrue(taskHandle.hasStopped());
+    testClock.tick(Duration.ofMillis(2001));
+    assertEquals(2L, (long) results.get(resultKey));
 
-    @Test
-    public void testParallelExecution() {
-        int N = 1000;
-        TestClock testClock = new TestClock();
-        Map<Integer, Long> results = new ConcurrentHashMap<>();
+    scheduledTaskExecutor.stop();
+  }
 
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService).setTick(Duration.ofMillis(5))
-            .setClock(testClock);
-        scheduledTaskExecutor.start();
+  @Test
+  public void testParallelExecution() {
+    final int tasksCount = 1000;
+    TestClock testClock = new TestClock();
+    Map<Integer, Long> results = new ConcurrentHashMap<>();
 
-        for (int i = 0; i < N; i++) {
-            final int idx = i;
-            scheduledTaskExecutor.scheduleAtFixedInterval(() -> {
-                if (results.get(idx) == null) {
-                    results.put(idx, 1L);
-                } else {
-                    results.put(idx, results.get(idx) + 1);
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }, Duration.ofSeconds(0), Duration.ofSeconds(2));
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService).setTick(Duration.ofMillis(5))
+        .setClock(testClock);
+    scheduledTaskExecutor.start();
+
+    for (int i = 0; i < tasksCount; i++) {
+      final int idx = i;
+      scheduledTaskExecutor.scheduleAtFixedInterval(() -> {
+        if (results.get(idx) == null) {
+          results.put(idx, 1L);
+        } else {
+          results.put(idx, results.get(idx) + 1);
         }
-
-        await().until(() -> {
-            for (int i = 0; i < N; i++) {
-                if (Objects.equals(results.get(i), 1)) {
-                    return false;
-                }
-            }
-            return true;
-        });
-
-        testClock.tick(Duration.ofSeconds(3));
-
-        await().until(() -> {
-            for (int i = 0; i < N; i++) {
-                if (Objects.equals(results.get(i), 2)) {
-                    return false;
-                }
-            }
-            return true;
-        });
-
-        scheduledTaskExecutor.stop();
-        assertTrue(scheduledTaskExecutor.waitUntilStopped(Duration.ofSeconds(2)));
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }, Duration.ofSeconds(0), Duration.ofSeconds(2));
     }
 
-    @Test
-    public void testIfAfterTaskStopTheTaskQueueIsCleaned() {
-        Map<String, Long> results = new ConcurrentHashMap<>();
+    await().until(() -> {
+      for (int i = 0; i < tasksCount; i++) {
+        if (Objects.equals(results.get(i), 1)) {
+          return false;
+        }
+      }
+      return true;
+    });
 
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService).setTick(Duration.ofMillis(5));
-        scheduledTaskExecutor.start();
+    testClock.tick(Duration.ofSeconds(3));
 
-        String resultKey = "myTask";
-        ScheduledTaskExecutor.TaskHandle taskHandle = scheduledTaskExecutor.scheduleAtFixedInterval(() -> {
-            if (results.get(resultKey) == null) {
-                results.put(resultKey, 1L);
-            } else {
-                results.put(resultKey, results.get(resultKey) + 1);
-            }
-        }, Duration.ofHours(1), Duration.ofHours(2));
+    await().until(() -> {
+      for (int i = 0; i < tasksCount; i++) {
+        if (Objects.equals(results.get(i), 2)) {
+          return false;
+        }
+      }
+      return true;
+    });
 
-        assertEquals(1, scheduledTaskExecutor.getTaskQueueSize());
-        taskHandle.stop();
-        assertEquals(0, scheduledTaskExecutor.getTaskQueueSize());
+    scheduledTaskExecutor.stop();
+    assertTrue(scheduledTaskExecutor.waitUntilStopped(Duration.ofSeconds(2)));
+  }
 
-        scheduledTaskExecutor.stop();
-    }
+  @Test
+  public void testIfAfterTaskStopTheTaskQueueIsCleaned() {
+    Map<String, Long> results = new ConcurrentHashMap<>();
 
-    @Test
-    public void testIfSchedulingOnceWorks() {
-        TestClock testClock = new TestClock();
-        Map<String, Long> results = new ConcurrentHashMap<>();
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService).setTick(Duration.ofMillis(5));
+    scheduledTaskExecutor.start();
 
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService).setTick(Duration.ofMillis(5))
-            .setClock(testClock);
-        scheduledTaskExecutor.start();
+    String resultKey = "myTask";
+    ScheduledTaskExecutor.TaskHandle taskHandle = scheduledTaskExecutor.scheduleAtFixedInterval(() -> {
+      if (results.get(resultKey) == null) {
+        results.put(resultKey, 1L);
+      } else {
+        results.put(resultKey, results.get(resultKey) + 1);
+      }
+    }, Duration.ofHours(1), Duration.ofHours(2));
 
-        String resultKey = "myTask";
-        ScheduledTaskExecutor.TaskHandle taskHandle = scheduledTaskExecutor.scheduleOnce(() -> {
-            if (results.get(resultKey) == null) {
-                results.put(resultKey, 1L);
-            } else {
-                results.put(resultKey, results.get(resultKey) + 1);
-            }
-        }, Duration.ofSeconds(1));
+    assertEquals(1, scheduledTaskExecutor.getTaskQueueSize());
+    taskHandle.stop();
+    assertEquals(0, scheduledTaskExecutor.getTaskQueueSize());
 
-        assertNull(results.get(resultKey));
-        testClock.tick(Duration.ofMillis(500));
-        assertNull(results.get(resultKey));
-        testClock.tick(Duration.ofMillis(501));
-        await().until(() -> results.containsKey(resultKey) && results.get(resultKey) == 1L && !taskHandle.isWorking());
+    scheduledTaskExecutor.stop();
+  }
 
-        assertEquals(0, scheduledTaskExecutor.getTaskQueueSize());
+  @Test
+  public void testIfSchedulingOnceWorks() {
+    TestClock testClock = new TestClock();
+    Map<String, Long> results = new ConcurrentHashMap<>();
 
-        scheduledTaskExecutor.stop();
-    }
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService).setTick(Duration.ofMillis(5))
+        .setClock(testClock);
+    scheduledTaskExecutor.start();
+
+    String resultKey = "myTask";
+    final ScheduledTaskExecutor.TaskHandle taskHandle = scheduledTaskExecutor.scheduleOnce(() -> {
+      if (results.get(resultKey) == null) {
+        results.put(resultKey, 1L);
+      } else {
+        results.put(resultKey, results.get(resultKey) + 1);
+      }
+    }, Duration.ofSeconds(1));
+
+    assertNull(results.get(resultKey));
+    testClock.tick(Duration.ofMillis(500));
+    assertNull(results.get(resultKey));
+    testClock.tick(Duration.ofMillis(501));
+    await().until(() -> results.containsKey(resultKey) && results.get(resultKey) == 1L && !taskHandle.isWorking());
+
+    assertEquals(0, scheduledTaskExecutor.getTaskQueueSize());
+
+    scheduledTaskExecutor.stop();
+  }
 }

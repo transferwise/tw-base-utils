@@ -1,37 +1,38 @@
 package com.transferwise.common.baseutils.transactionsmanagement;
 
+import java.util.concurrent.Callable;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
-
-import java.util.concurrent.Callable;
 
 /**
  * We will not follow old J2EE logic about RuntimeExceptions vs CheckedExceptions and rollback on any exception.
  */
 public interface ITransactionsHelper {
-    boolean isRollbackOnly();
 
-    void markAsRollbackOnly();
+  boolean isRollbackOnly();
 
-    IBuilder withTransaction();
+  void markAsRollbackOnly();
 
-    interface IBuilder {
-        IBuilder withPropagation(Propagation propagation);
+  IBuilder withTransaction();
 
-        IBuilder asNew();
+  interface IBuilder {
 
-        IBuilder asSuspended();
+    IBuilder withPropagation(Propagation propagation);
 
-        IBuilder asReadOnly();
+    IBuilder asNew();
 
-        IBuilder asReadOnly(boolean readOnly);
+    IBuilder asSuspended();
 
-        IBuilder withName(String name);
+    IBuilder asReadOnly();
 
-        IBuilder withIsolation(Isolation isolation);
+    IBuilder asReadOnly(boolean readOnly);
 
-        IBuilder withTimeout(Integer timeout);
+    IBuilder withName(String name);
 
-        <T> T call(Callable<T> callable);
-    }
+    IBuilder withIsolation(Isolation isolation);
+
+    IBuilder withTimeout(Integer timeout);
+
+    <T> T call(Callable<T> callable);
+  }
 }

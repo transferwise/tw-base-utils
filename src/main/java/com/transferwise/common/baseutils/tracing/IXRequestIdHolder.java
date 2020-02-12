@@ -1,41 +1,41 @@
 package com.transferwise.common.baseutils.tracing;
 
-import com.transferwise.common.baseutils.function.RunnableWithException;
-
-import java.util.concurrent.Callable;
-
 import static java.lang.Character.isLetterOrDigit;
 
+import com.transferwise.common.baseutils.function.RunnableWithException;
+import java.util.concurrent.Callable;
+
 public interface IXRequestIdHolder {
-    int MAX_REQUEST_ID_LENGTH = 36;
 
-    String generate();
+  int MAX_REQUEST_ID_LENGTH = 36;
 
-    String current();
+  String generate();
 
-    void set(String requestId);
+  String current();
 
-    default boolean isValid(String requestId) {
-        return isValidRequestId(requestId);
+  void set(String requestId);
+
+  default boolean isValid(String requestId) {
+    return isValidRequestId(requestId);
+  }
+
+  void remove(String requestId);
+
+  <T> T with(Object o, Callable<T> callable);
+
+  void with(Object o, RunnableWithException runnable);
+
+  static boolean isValidRequestId(String requestId) {
+    if (requestId == null || requestId.length() > MAX_REQUEST_ID_LENGTH) {
+      return false;
     }
 
-    void remove(String requestId);
-
-    <T> T with(Object o, Callable<T> callable);
-
-    void with(Object o, RunnableWithException runnable);
-
-    static boolean isValidRequestId(String requestId) {
-        if (requestId == null || requestId.length() > MAX_REQUEST_ID_LENGTH) {
-            return false;
-        }
-
-        final int sz = requestId.length();
-        for (int i = 0; i < sz; i++) {
-            if (!isLetterOrDigit(requestId.charAt(i)) && requestId.charAt(i) != '-') {
-                return false;
-            }
-        }
-        return true;
+    final int sz = requestId.length();
+    for (int i = 0; i < sz; i++) {
+      if (!isLetterOrDigit(requestId.charAt(i)) && requestId.charAt(i) != '-') {
+        return false;
+      }
     }
+    return true;
+  }
 }

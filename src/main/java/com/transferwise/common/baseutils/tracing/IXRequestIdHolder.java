@@ -5,6 +5,12 @@ import static java.lang.Character.isLetterOrDigit;
 import com.transferwise.common.baseutils.function.RunnableWithException;
 import java.util.concurrent.Callable;
 
+/**
+ * Old Tw tracking system.
+ * 
+ * @deprecated in favor of Jaegar tracing.
+ */
+@Deprecated
 public interface IXRequestIdHolder {
 
   int MAX_REQUEST_ID_LENGTH = 36;

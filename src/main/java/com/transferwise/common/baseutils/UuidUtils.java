@@ -19,7 +19,9 @@ public class UuidUtils {
   }
 
   /**
-   * Uses 38 bit prefix based on current milliseconds giving 3181 days roll-over.
+   * Random UUID with 38 bit prefix based on current milliseconds from epoch.
+   * 
+   * <p>Giving about 3181 days roll-over.
    */
   public static UUID generatePrefixCombUuid() {
     return generatePrefixCombUuid(38);
@@ -27,8 +29,12 @@ public class UuidUtils {
 
   /**
    * Generates time prefixed random UUID.
+   * 
+   * <p>Time will be truncated so that only given amount of bits will remain. 
+   * 
+   * <p>Rest of the bits in UUID are completely random.
    *
-   * @param timePrefixLengthBits how much information to retain from the time. Technically time is left shifted so many bits.
+   * @param timePrefixLengthBits technically we left-shift the current time-millis by that amount.
    */
   public static UUID generatePrefixCombUuid(int timePrefixLengthBits) {
     if (timePrefixLengthBits < 1 || timePrefixLengthBits > 63) {

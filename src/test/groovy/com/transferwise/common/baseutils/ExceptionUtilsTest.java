@@ -8,9 +8,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.Callable;
 import lombok.SneakyThrows;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ExceptionUtilsTest {
+public class ExceptionUtilsTest extends BaseTest {
 
   @Test
   public void testUncheckedCall() {

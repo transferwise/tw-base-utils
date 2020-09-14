@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import com.transferwise.common.baseutils.BaseTest;
 import com.transferwise.common.baseutils.clock.TestClock;
 import java.time.Duration;
 import java.util.Map;
@@ -14,15 +15,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 @Slf4j
 @SuppressWarnings({"checkstyle:MagicNumber", "checkstyle:MultipleStringLiterals"})
-public class SimpleScheduledTaskExecutorTest {
+public class SimpleScheduledTaskExecutorTest extends BaseTest {
 
   @Test
-  @Ignore("This test is for manual tweaking.")
+  @Disabled("This test is for manual tweaking.")
   public void testManually() throws InterruptedException {
     ExecutorService executorService = Executors.newCachedThreadPool();
     SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService);
@@ -43,7 +44,7 @@ public class SimpleScheduledTaskExecutorTest {
   }
 
   @Test
-  @Ignore("This test is for manual tweaking.")
+  @Disabled("This test is for manual tweaking.")
   public void testManuallyOnceExecution() throws InterruptedException {
     ExecutorService executorService = Executors.newCachedThreadPool();
     SimpleScheduledTaskExecutor scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService);

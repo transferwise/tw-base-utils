@@ -8,6 +8,11 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
+/**
+ * Old Tw tracking system.
+ *
+ * @deprecated in favor of Jaegar tracing.
+ */
 public class MdcXRequestIdHolder implements IXRequestIdHolder {
 
   @Setter

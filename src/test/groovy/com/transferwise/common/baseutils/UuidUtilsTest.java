@@ -59,4 +59,9 @@ public class UuidUtilsTest extends BaseTest {
     assertArrayEquals(expected, result);
   }
 
+  @Test
+  public void generatingSecuredUuidWorks() {
+    assertThat(UuidUtils.generateSecureUuid()).isNotNull();
+  }
+
 }

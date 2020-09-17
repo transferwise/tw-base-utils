@@ -19,9 +19,18 @@ public class UuidUtils {
   }
 
   /**
+   * Completely random UUID suitable for authentication tokens.
+   */
+  public static UUID generateSecureUuid() {
+    return new UUID(numberGenerator.nextLong(), numberGenerator.nextLong());
+  }
+  
+  /**
    * Random UUID with 38 bit prefix based on current milliseconds from epoch.
    * 
    * <p>Giving about 3181 days roll-over.
+   * 
+   * <p>This UUID is not suitable for things like session and authentication tokens.
    */
   public static UUID generatePrefixCombUuid() {
     return generatePrefixCombUuid(38);
@@ -33,6 +42,8 @@ public class UuidUtils {
    * <p>Time will be truncated so that only given amount of bits will remain. 
    * 
    * <p>Rest of the bits in UUID are completely random.
+   * 
+   * <p>This UUID is not suitable for things like session and authentication tokens.
    *
    * @param timePrefixLengthBits technically we left-shift the current time-millis by that amount.
    */

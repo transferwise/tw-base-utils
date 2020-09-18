@@ -12,7 +12,7 @@ public class UuidUtils {
 
   private static long[] BIT_MASK = new long[64];
 
-  private static int v4VersionBits = 4 << 12;
+  private static int V4_VERSION_BITS = 4 << 12;
 
   static {
     for (int i = 0; i < 64; i++) {
@@ -24,7 +24,7 @@ public class UuidUtils {
    * Completely random UUID suitable for authentication tokens.
    */
   public static UUID generateSecureUuid() {
-    return new UUID(applyVersionBits(numberGenerator.nextLong(), v4VersionBits), numberGenerator.nextLong());
+    return new UUID(applyVersionBits(numberGenerator.nextLong(), V4_VERSION_BITS), numberGenerator.nextLong());
   }
 
   /**
@@ -58,7 +58,7 @@ public class UuidUtils {
 
     long msb = (timestamp << (64 - timePrefixLengthBits)) | (numberGenerator.nextLong() & BIT_MASK[64 - timePrefixLengthBits]);
     long lsb = numberGenerator.nextLong();
-    return new UUID(applyVersionBits(msb, v4VersionBits), lsb);
+    return new UUID(applyVersionBits(msb, V4_VERSION_BITS), lsb);
   }
 
   public static UUID toUuid(byte[] bytes) {

@@ -33,6 +33,9 @@ public class UuidUtilsTest extends BaseTest {
         assertThat(previousTime).isLessThan(time);
       }
       previousTime = time;
+
+      System.out.println(uuids[i]);
+      assertThat(uuids[i].version()).isEqualTo(4);
     }
 
     assertThat(uuids).isSorted();

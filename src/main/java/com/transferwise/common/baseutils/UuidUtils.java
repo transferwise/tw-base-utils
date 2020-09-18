@@ -12,6 +12,8 @@ public class UuidUtils {
 
   private static long[] BIT_MASK = new long[64];
 
+  private static int v4VersionBits = 4 << 12;
+
   static {
     for (int i = 0; i < 64; i++) {
       BIT_MASK[i] = (1L << i) - 1;
@@ -22,14 +24,14 @@ public class UuidUtils {
    * Completely random UUID suitable for authentication tokens.
    */
   public static UUID generateSecureUuid() {
-    return new UUID(numberGenerator.nextLong(), numberGenerator.nextLong());
+    return new UUID(applyVersionBits(numberGenerator.nextLong(), v4VersionBits), numberGenerator.nextLong());
   }
-  
+
   /**
    * Random UUID with 38 bit prefix based on current milliseconds from epoch.
-   * 
+   *
    * <p>Giving about 3181 days roll-over.
-   * 
+   *
    * <p>This UUID is not suitable for things like session and authentication tokens.
    */
   public static UUID generatePrefixCombUuid() {
@@ -38,11 +40,11 @@ public class UuidUtils {
 
   /**
    * Generates time prefixed random UUID.
-   * 
-   * <p>Time will be truncated so that only given amount of bits will remain. 
-   * 
+   *
+   * <p>Time will be truncated so that only given amount of bits will remain.
+   *
    * <p>Rest of the bits in UUID are completely random.
-   * 
+   *
    * <p>This UUID is not suitable for things like session and authentication tokens.
    *
    * @param timePrefixLengthBits technically we left-shift the current time-millis by that amount.
@@ -56,7 +58,7 @@ public class UuidUtils {
 
     long msb = (timestamp << (64 - timePrefixLengthBits)) | (numberGenerator.nextLong() & BIT_MASK[64 - timePrefixLengthBits]);
     long lsb = numberGenerator.nextLong();
-    return new UUID(msb, lsb);
+    return new UUID(applyVersionBits(msb, v4VersionBits), lsb);
   }
 
   public static UUID toUuid(byte[] bytes) {
@@ -88,5 +90,9 @@ public class UuidUtils {
     bb.putLong(uuid.getLeastSignificantBits());
 
     return bytes;
+  }
+
+  protected static long applyVersionBits(final long msb, int versionBits) {
+    return (msb & 0xffffffffffff0fffL) | versionBits;
   }
 }

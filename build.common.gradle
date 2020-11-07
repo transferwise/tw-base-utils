@@ -6,7 +6,7 @@ ext.artifactoryPassword = project.hasProperty("artifactoryPassword") ? project.a
 ext.projectGitHubRepoName = "tw-entrypoints"
 ext.projectScmUrl = "https://github.com/transferwise/${projectGitHubRepoName}"
 ext.projectScmConnection = "scm:git:git://github.com/transferwise/${projectGitHubRepoName}.git"
-ext.springBootVersion = "2.2.4.RELEASE"
+ext.springBootVersion = "2.3.5.RELEASE"
 
 buildscript {
     repositories {
@@ -168,7 +168,10 @@ tasks.withType(Checkstyle) {
     //config = getCheckstyleConfig()
     config = resources.text.fromFile(file('google_checks.xml'))
 
-    maxWarnings = 3
+    // Deprecated, checkstyle does not like the namings.
+    exclude "com/transferwise/common/baseutils/tracing/**"
+
+    maxWarnings = 0
 
     reports {
         xml.enabled false

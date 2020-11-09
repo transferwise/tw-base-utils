@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 
 /**
  * Old Tw tracking system.
- * 
+ *
  * @deprecated in favor of Jaegar tracing.
  */
 @Deprecated

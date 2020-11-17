@@ -23,6 +23,7 @@ apply plugin: "checkstyle"
 apply plugin: "idea"
 apply plugin: "com.github.spotbugs"
 apply plugin: "groovy"
+apply plugin: "signing"
 
 group = "com.transferwise.common"
 
@@ -110,11 +111,9 @@ publishing {
         }
     }
 
-/*
     signing {
         sign publishing.publications.mavenJava
     }
-*/
 
     javadoc {
         if (JavaVersion.current().isJava9Compatible()) {
@@ -123,20 +122,20 @@ publishing {
     }
 
     repositories {
-        maven {
+       /* maven {
             url "https://arti.tw.ee/artifactory/libs-${project.version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release'}-local"
             credentials {
                 username = artifactoryUser
                 password = artifactoryPassword
             }
-        }
-        /*maven {
+        }*/
+        maven {
             url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
             credentials {
                 username sonatypeUsername
                 password sonatypePassword
             }
-        }*/
+        }
     }
 }
 

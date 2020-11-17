@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+}
+
+repositories{
+    maven {
+        url = "https://bintray.com/transferwise/maven"
+    }
+}
+
+dependencies{
+    compile 'com.transferwise.common:tw-base-utils:1.3.2'
+}

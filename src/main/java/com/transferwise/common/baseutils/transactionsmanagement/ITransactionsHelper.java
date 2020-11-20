@@ -34,5 +34,7 @@ public interface ITransactionsHelper {
     IBuilder withTimeout(Integer timeout);
 
     <T> T call(Callable<T> callable);
+
+    void run(Runnable runnable);
   }
 }

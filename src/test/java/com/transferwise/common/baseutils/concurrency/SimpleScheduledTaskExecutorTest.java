@@ -12,8 +12,11 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -105,6 +108,7 @@ public class SimpleScheduledTaskExecutorTest extends BaseTest {
   }
 
   @Test
+  @SneakyThrows
   public void testParallelExecution() {
     final int tasksCount = 1000;
     TestClock testClock = new TestClock();
@@ -115,6 +119,8 @@ public class SimpleScheduledTaskExecutorTest extends BaseTest {
         .setClock(testClock);
     scheduledTaskExecutor.start();
 
+    CountDownLatch latch = new CountDownLatch(tasksCount);
+
     for (int i = 0; i < tasksCount; i++) {
       final int idx = i;
       scheduledTaskExecutor.scheduleAtFixedInterval(() -> {
@@ -123,28 +129,25 @@ public class SimpleScheduledTaskExecutorTest extends BaseTest {
         } else {
           results.put(idx, results.get(idx) + 1);
         }
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
+        latch.countDown();
       }, Duration.ofSeconds(0), Duration.ofSeconds(2));
     }
 
     await().until(() -> {
       for (int i = 0; i < tasksCount; i++) {
-        if (Objects.equals(results.get(i), 1)) {
+        if (results.get(i) == null) {
           return false;
         }
       }
       return true;
     });
 
-    testClock.tick(Duration.ofSeconds(3));
+    latch.await(1, TimeUnit.MINUTES);
 
     await().until(() -> {
+      testClock.tick(Duration.ofSeconds(1));
       for (int i = 0; i < tasksCount; i++) {
-        if (Objects.equals(results.get(i), 2)) {
+        if (results.get(i) < 2) {
           return false;
         }
       }

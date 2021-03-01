@@ -8,7 +8,7 @@ buildscript {
 }
 
 plugins {
-    id "com.github.spotbugs" version "4.5.1"
+    id "com.github.spotbugs" version "4.6.2"
     id "idea"
 }
 
@@ -27,14 +27,19 @@ apply from: 'build.common.gradle'
 dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter'
     compileOnly 'org.springframework:spring-tx'
-    compileOnly 'com.github.spotbugs:spotbugs-annotations:4.1.4'
+    compileOnly 'com.github.spotbugs:spotbugs-annotations:4.2.1'
+    compileOnly 'io.micrometer:micrometer-core:1.6.4'
 
     implementation 'org.slf4j:slf4j-api'
     implementation 'org.apache.commons:commons-lang3'
+
     testImplementation 'junit:junit'
-    testImplementation 'org.codehaus.groovy:groovy:2.5.13'
+    testImplementation 'org.codehaus.groovy:groovy:2.5.14'
     testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
     testImplementation 'org.awaitility:awaitility:4.0.3'
+    testImplementation 'io.micrometer:micrometer-core:1.6.4'
+    testImplementation 'org.assertj:assertj-core:3.19.0'
+
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine"
 }
 

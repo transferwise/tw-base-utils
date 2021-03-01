@@ -220,7 +220,7 @@ public class DiscardingQueueProcessor<T, K> {
 
   @Data
   @Accessors(chain = true)
-  public class Payload<PT> {
+  public static class Payload<PT> {
 
     private PT data;
     private long schedulingTimeMillis = ClockHolder.getClock().millis();

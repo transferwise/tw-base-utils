@@ -70,14 +70,16 @@ public abstract class TagsSet {
   static class SingleTagsSet extends TagsSet {
 
     private Tag tag;
+    private int hashCode;
 
     public SingleTagsSet(@Nonnull Tag tag) {
       this.tag = tag;
+      this.hashCode = tag.hashCode();
     }
 
     @Override
     public int hashCode() {
-      return tag.hashCode();
+      return hashCode;
     }
 
     @Override

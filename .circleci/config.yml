@@ -48,6 +48,7 @@ jobs:
     <<: *container_config
     resource_class: small
     steps:
+      - checkout
       - restore_cache:
           key: tw-base-utils-gradle-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:

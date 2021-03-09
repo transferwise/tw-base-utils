@@ -117,5 +117,13 @@ public class TransactionsHelper implements ITransactionsHelper {
         return result;
       });
     }
+
+    @Override
+    public void run(Runnable runnable) {
+      call(() -> {
+        runnable.run();
+        return null;
+      });
+    }
   }
 }

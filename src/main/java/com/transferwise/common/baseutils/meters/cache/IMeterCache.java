@@ -2,6 +2,7 @@ package com.transferwise.common.baseutils.meters.cache;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.util.function.Supplier;
 
@@ -31,4 +32,6 @@ public interface IMeterCache {
   Counter counter(String name, TagsSet tags);
 
   Counter counter(String name, TagsSet tags, Supplier<Counter> supplier);
+
+  MeterRegistry getMeterRegistry();
 }

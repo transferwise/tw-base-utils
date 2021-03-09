@@ -73,4 +73,9 @@ public class MeterCache implements IMeterCache {
   public Counter counter(String name, TagsSet tags, Supplier<Counter> metricCreator) {
     return (Counter) metricsMap.computeIfAbsent(Pair.of(name, tags), k -> metricCreator.get());
   }
+
+  @Override
+  public MeterRegistry getMeterRegistry() {
+    return meterRegistry;
+  }
 }

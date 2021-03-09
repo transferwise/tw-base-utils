@@ -64,6 +64,7 @@ public class ExceptionUtilsTest extends BaseTest {
     throw t;
   }
 
+  @SuppressWarnings("rawtypes")
   private Throwable catchAndReturn(Callable callable) {
     try {
       callable.call();

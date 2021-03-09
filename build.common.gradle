@@ -6,7 +6,7 @@ ext.artifactoryPassword = project.hasProperty("artifactoryPassword") ? project.a
 ext.projectGitHubRepoName = "tw-entrypoints"
 ext.projectScmUrl = "https://github.com/transferwise/${projectGitHubRepoName}"
 ext.projectScmConnection = "scm:git:git://github.com/transferwise/${projectGitHubRepoName}.git"
-ext.springBootVersion = "2.3.5.RELEASE"
+ext.springBootVersion = "2.3.9.RELEASE"
 
 buildscript {
     repositories {
@@ -71,6 +71,14 @@ compileJava {
     options.compilerArgs << '-parameters'
     options.compilerArgs << '-Xlint'
     options.compilerArgs << '-Xlint:-processing'
+}
+
+compileTestJava {
+    sourceCompatibility = JavaVersion.VERSION_15
+    targetCompatibility = JavaVersion.VERSION_15
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(15)
+    }
 }
 
 publishing {
@@ -141,6 +149,10 @@ publishing {
 }
 
 test {
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(15)
+    }
+
     testLogging {
         events TestLogEvent.STARTED, TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED,
                 TestLogEvent.STANDARD_ERROR

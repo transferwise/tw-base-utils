@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,13 +92,29 @@ public class MeterCacheTest {
   }
 
   @Test
-  public void meterCollectionCanBeUsed() {
+  public void meterContainersCanBeUsed() {
     meterCache.metersContainer("name", TagsSet.of("a", "av"), () -> "Hello World");
     assertThat(meterCache.metersContainer("name", TagsSet.of("a", "av"), () -> "Hello World 1")).isEqualTo("Hello World");
     assertThat(meterCache.size()).isEqualTo(1);
 
     meterCache.clear();
-    assertThat(meterCache.metersContainer("name", TagsSet.of("a", "av"), () -> "Hello World 1")).isEqualTo("Hello World 1");
+    String metersContainer = meterCache.metersContainer("name", TagsSet.of("a", "av"), () -> "Hello World 1");
+    assertThat(metersContainer).isEqualTo("Hello World 1");
+
+    assertThat(meterCache.removeMetersContainer("name", TagsSet.of("a", "av"))).isSameAs(metersContainer);
+    assertThat(meterCache.size()).isEqualTo(0);
+  }
+
+  @Test
+  public void specificMeterCanBeRemovedFromCache() {
+    Timer timer0 = meterCache.timer("my.timer.0", TagsSet.of("a", "av0"));
+    meterCache.timer("my.timer.0", TagsSet.of("a", "av1"));
+    assertThat(meterCache.size()).isEqualTo(2);
+    assertThat(meterCache.removeMeter("my.timer.0", TagsSet.of("a", "av0"))).isSameAs(timer0);
+    assertThat(meterCache.size()).isEqualTo(1);
+    assertThat(meterCache.removeMeter("my.timer.0", TagsSet.of("a", "av0"))).isNull();
+
+    assertThat(meterCache.timer("my.timer.0", TagsSet.of("a", "av0"))).as("Underlying meter is still present in meter registry").isSameAs(timer0);
   }
 
 }

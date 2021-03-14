@@ -12,7 +12,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class MeterCache implements IMeterCache {
 
-  private Map<Pair<String, TagsSet>, Meter> metricsMap = new ConcurrentHashMap<>();
+  private Map<Pair<String, TagsSet>, Meter> metersMap = new ConcurrentHashMap<>();
 
   private Map<Pair<String, TagsSet>, Object> metersContainersMap = new ConcurrentHashMap<>();
 
@@ -24,18 +24,28 @@ public class MeterCache implements IMeterCache {
 
   @Override
   public boolean contains(String name, TagsSet tags) {
-    return metricsMap.containsKey(Pair.of(name, tags));
+    return metersMap.containsKey(Pair.of(name, tags));
   }
 
   @Override
   public void clear() {
-    metricsMap.clear();
+    metersMap.clear();
     metersContainersMap.clear();
   }
 
   @Override
   public int size() {
-    return metricsMap.size() + metersContainersMap.size();
+    return metersMap.size() + metersContainersMap.size();
+  }
+
+  @Override
+  public Meter removeMeter(String name, TagsSet tags) {
+    return metersMap.remove(Pair.of(name, tags));
+  }
+
+  @Override
+  public Object removeMetersContainer(String name, TagsSet tags) {
+    return metersContainersMap.remove(Pair.of(name, tags));
   }
 
   @Override
@@ -46,32 +56,32 @@ public class MeterCache implements IMeterCache {
 
   @Override
   public DistributionSummary summary(String name, TagsSet tags) {
-    return (DistributionSummary) metricsMap.computeIfAbsent(Pair.of(name, tags), k -> meterRegistry.summary(name, tags.getMicrometerTags()));
+    return (DistributionSummary) metersMap.computeIfAbsent(Pair.of(name, tags), k -> meterRegistry.summary(name, tags.getMicrometerTags()));
   }
 
   @Override
   public DistributionSummary summary(String name, TagsSet tags, Supplier<DistributionSummary> metricCreator) {
-    return (DistributionSummary) metricsMap.computeIfAbsent(Pair.of(name, tags), k -> metricCreator.get());
+    return (DistributionSummary) metersMap.computeIfAbsent(Pair.of(name, tags), k -> metricCreator.get());
   }
 
   @Override
   public Timer timer(String name, TagsSet tags) {
-    return (Timer) metricsMap.computeIfAbsent(Pair.of(name, tags), k -> meterRegistry.timer(name, tags.getMicrometerTags()));
+    return (Timer) metersMap.computeIfAbsent(Pair.of(name, tags), k -> meterRegistry.timer(name, tags.getMicrometerTags()));
   }
 
   @Override
   public Timer timer(String name, TagsSet tags, Supplier<Timer> metricCreator) {
-    return (Timer) metricsMap.computeIfAbsent(Pair.of(name, tags), k -> metricCreator.get());
+    return (Timer) metersMap.computeIfAbsent(Pair.of(name, tags), k -> metricCreator.get());
   }
 
   @Override
   public Counter counter(String name, TagsSet tagsSet) {
-    return (Counter) metricsMap.computeIfAbsent(Pair.of(name, tagsSet), k -> meterRegistry.counter(name, tagsSet.getMicrometerTags()));
+    return (Counter) metersMap.computeIfAbsent(Pair.of(name, tagsSet), k -> meterRegistry.counter(name, tagsSet.getMicrometerTags()));
   }
 
   @Override
   public Counter counter(String name, TagsSet tags, Supplier<Counter> metricCreator) {
-    return (Counter) metricsMap.computeIfAbsent(Pair.of(name, tags), k -> metricCreator.get());
+    return (Counter) metersMap.computeIfAbsent(Pair.of(name, tags), k -> metricCreator.get());
   }
 
   @Override

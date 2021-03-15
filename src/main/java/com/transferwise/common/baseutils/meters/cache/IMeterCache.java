@@ -2,6 +2,7 @@ package com.transferwise.common.baseutils.meters.cache;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.util.function.Supplier;
@@ -13,6 +14,10 @@ public interface IMeterCache {
   void clear();
 
   int size();
+
+  Meter removeMeter(String name, TagsSet tags);
+
+  Object removeMetersContainer(String name, TagsSet tags);
 
   /**
    * Allows to also cache Objects, which contain multiple meters.

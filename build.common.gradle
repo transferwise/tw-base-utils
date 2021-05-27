@@ -11,9 +11,6 @@ ext.springBootVersion = "2.3.11.RELEASE"
 buildscript {
     repositories {
         mavenCentral()
-        /*maven {
-            setUrl("https://arti.tw.ee/artifactory/plugins-release")
-        }*/
         mavenLocal()
     }
 }

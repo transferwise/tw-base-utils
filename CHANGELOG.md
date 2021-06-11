@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Moved from JDK 8 to JDK 11.
 * Starting to push to Maven Central again.
 
+## [1.6.0] - 2021-06-11
+### Changed
+* Added ConnectionProxy interface
+
+## [1.5.0] - 2021-06-06
+### Changed
+* JDK 11+ is now requirement
+
 ## [1.4.1] - 2021-03-14
 ### Changed
 * Allowing clearing only specific metrics from meter cache.

@@ -63,4 +63,12 @@ public class TestClock extends Clock {
   public void tick(Duration duration) {
     instant = instant.plus(duration);
   }
+
+  /**
+   * @see java.time.Duration#parse(CharSequence)
+   * @param duration a string representing a Duration, for example "P1D" for 1 day or "PT1M" for 1 minute
+   */
+  public void plus(String duration) {
+    tick(Duration.parse(duration));
+  }
 }

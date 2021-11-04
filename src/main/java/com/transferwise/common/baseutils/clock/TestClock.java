@@ -65,6 +65,7 @@ public class TestClock extends Clock {
   }
 
   /**
+   * Advances current test clock by duration represented by string.
    * @see java.time.Duration#parse(CharSequence)
    * @param duration a string representing a Duration, for example "P1D" for 1 day or "PT1M" for 1 minute
    */

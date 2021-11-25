@@ -20,27 +20,27 @@ class AnnotationClassOrdererTest {
   @RequiredArgsConstructor
   static class MockClassDescriptor implements ClassDescriptor {
 
-    private final Class<?> aClass;
+    private final Class<?> theClass;
 
     @Override
     public Class<?> getTestClass() {
-      return aClass;
+      return theClass;
     }
 
     @Override
     public String getDisplayName() {
-      return aClass.getName();
+      return theClass.getName();
     }
 
     @Override
     public boolean isAnnotated(Class<? extends Annotation> annotationType) {
-      return aClass.getAnnotations().length > 0;
+      return theClass.getAnnotations().length > 0;
     }
 
     @Override
     public <A extends Annotation> Optional<A> findAnnotation(Class<A> annotationType) {
       try {
-        return Optional.of(aClass.getAnnotation(annotationType));
+        return Optional.of(theClass.getAnnotation(annotationType));
       } catch (Exception e) {
         return Optional.empty();
       }
@@ -88,8 +88,8 @@ class AnnotationClassOrdererTest {
       @Override
       public List<? extends ClassDescriptor> getClassDescriptors() {
         if (values.isEmpty()) {
-          for (Class<?> aClass : classes) {
-            values.add(new MockClassDescriptor(aClass));
+          for (Class<?> theClass : classes) {
+            values.add(new MockClassDescriptor(theClass));
           }
         }
 

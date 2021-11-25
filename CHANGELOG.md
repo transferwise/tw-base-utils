@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2021-11-25
+### Added
+* `AnnotationClassOrderer` - JUnit 5 custom orderer, to run test classes in order defined by an annotation
+* `ClassOrder` - Annotation for custom ordering of test classes
+
 ## [1.7.0] - 2021-11-04
 ### Changed
 * Added TestClock#plus(String) method.

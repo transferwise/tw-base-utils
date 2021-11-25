@@ -10,7 +10,6 @@ import com.transferwise.common.baseutils.BaseTest;
 import com.transferwise.common.baseutils.clock.TestClock;
 import java.time.Duration;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;

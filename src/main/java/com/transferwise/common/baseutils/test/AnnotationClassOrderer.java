@@ -5,6 +5,11 @@ import org.junit.jupiter.api.ClassDescriptor;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.ClassOrdererContext;
 
+/**
+ * Usage in junit-platform.properties: ```junit.jupiter.testclass.order.default=org.example.tests.AnnotationClassOrderer```
+ * <p>
+ * Used in conjunction with {@linkplain ClassOrder} annotations to explicitly define test ordering in JUnit 5.8+
+ */
 public class AnnotationClassOrderer implements ClassOrderer {
 
   @Override

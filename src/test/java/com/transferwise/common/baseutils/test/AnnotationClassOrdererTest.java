@@ -1,32 +1,21 @@
 package com.transferwise.common.baseutils.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.ClassDescriptor;
 import org.junit.jupiter.api.ClassOrdererContext;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class AnnotationClassOrdererTest {
-
-  @ClassOrder(2)
-  static class TestA {
-
-  }
-
-  @ClassOrder(3)
-  static class TestB {
-
-  }
-
-  @ClassOrder(1)
-  static class TestC {
-
-  }
 
   @RequiredArgsConstructor
   static class MockClassDescriptor implements ClassDescriptor {
@@ -65,17 +54,43 @@ class AnnotationClassOrdererTest {
 
   private final AnnotationClassOrderer orderer = new AnnotationClassOrderer();
 
-  @Test
-  void test() {
+  @ClassOrder(2)
+  static class TestA {
+
+  }
+
+  @ClassOrder(3)
+  static class TestB {
+
+  }
+
+  @ClassOrder(1)
+  static class TestC {
+
+  }
+
+  static class TestImplicitA {
+
+  }
+
+  @ClassOrder(1)
+  static class TestImplicitB {
+
+  }
+
+  @ParameterizedTest(name = "{displayName}")
+  @DisplayName("test class ordering - {0}")
+  @MethodSource
+  void testAnnotationOrdering(List<Class<?>> classes, List<Class<?>> expected) {
     ClassOrdererContext context = new ClassOrdererContext() {
       private final List<MockClassDescriptor> values = new ArrayList<>();
 
       @Override
       public List<? extends ClassDescriptor> getClassDescriptors() {
         if (values.isEmpty()) {
-          values.add(new MockClassDescriptor(TestA.class));
-          values.add(new MockClassDescriptor(TestB.class));
-          values.add(new MockClassDescriptor(TestC.class));
+          for (Class<?> aClass : classes) {
+            values.add(new MockClassDescriptor(aClass));
+          }
         }
 
         return values;
@@ -88,9 +103,19 @@ class AnnotationClassOrdererTest {
     };
 
     orderer.orderClasses(context);
-    assertThat(context.getClassDescriptors()).hasSize(3);
-    assertThat(context.getClassDescriptors().get(0).getTestClass()).isEqualTo(TestC.class);
-    assertThat(context.getClassDescriptors().get(1).getTestClass()).isEqualTo(TestA.class);
-    assertThat(context.getClassDescriptors().get(2).getTestClass()).isEqualTo(TestB.class);
+    assertThat(context.getClassDescriptors()).hasSize(expected.size());
+    for (int i = 0; i < expected.size(); i++) {
+      assertThat(context.getClassDescriptors().get(i).getTestClass()).isEqualTo(expected.get(i));
+    }
+  }
+
+  static Stream<Arguments> testAnnotationOrdering() {
+    return Stream.of(
+        Arguments.of(
+            List.of(TestA.class, TestB.class, TestC.class),
+            List.of(TestC.class, TestA.class, TestB.class)),
+        Arguments.of(
+            List.of(TestImplicitA.class, TestImplicitB.class, TestImplicitA.class),
+            List.of(TestImplicitB.class, TestImplicitA.class, TestImplicitA.class)));
   }
 }

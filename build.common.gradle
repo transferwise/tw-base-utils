@@ -1,12 +1,13 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
-ext.artifactoryUser = project.hasProperty("artifactoryUser") ? project.artifactoryUser : System.env.ARTIFACTORY_USER as String
-ext.artifactoryPassword = project.hasProperty("artifactoryPassword") ? project.artifactoryPassword : System.env.ARTIFACTORY_PASSWORD as String
-ext.projectGitHubRepoName = "tw-entrypoints"
+ext.projectGitHubRepoName = "tw-base-utils"
 ext.projectScmUrl = "https://github.com/transferwise/${projectGitHubRepoName}"
 ext.projectScmConnection = "scm:git:git://github.com/transferwise/${projectGitHubRepoName}.git"
 ext.springBootVersion = "2.3.11.RELEASE"
+ext.authorName = "Kristo Kuuskül"
+ext.authorGithub = "onukristo"
+ext.authorEmail = "kristo.kuuskull@transferwise.com"
 
 buildscript {
     repositories {
@@ -79,74 +80,61 @@ compileTestJava {
 }
 
 publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            afterEvaluate {
-                artifactId = projectArtifactName
-            }
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+			afterEvaluate {
+				artifactId = projectArtifactName
+			}
 
-            pom {
-                name = projectName
-                description = projectDescription
-                url = projectScmUrl
-                packaging = "jar"
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0, Copyright 2021 TransferWise Ltd'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'onukristo'
-                        name = 'Kristo Kuusküll'
-                        email = "kristo.kuuskull@transferwise.com"
-                        organization = "Transferwise Ltd"
-                        organizationUrl = "https://github.com/transferwise"
-                    }
-                }
-                scm {
-                    connection = projectScmConnection
-                    developerConnection = projectScmConnection
-                    url = projectScmUrl
-                }
-            }
-        }
-    }
+			pom {
+				name = projectName
+				description = projectDescription
+				url = projectScmUrl
+				packaging = "jar"
+				licenses {
+					license {
+						name = 'The Apache License, Version 2.0, Copyright 2019 TransferWise Ltd'
+						url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					}
+				}
+				developers {
+					developer {
+						id = authorGithub
+						name = authorName
+						email = authorEmail
+						organization = "Transferwise Ltd"
+						organizationUrl = "https://github.com/transferwise"
+					}
+				}
+				scm {
+					connection = projectScmConnection
+					developerConnection = projectScmConnection
+					url = projectScmUrl
+				}
+			}
+		}
+	}
 
-    if (System.getenv("OPENSOURCE_PUBLISH") == "true") {
-        signing {
+	signing {
+		def signingKey = System.env.OSS_SIGNING_KEY as String
+		def signingPassword = System.env.OSS_SIGNING_PASSWORD as String
+
+		if (signingKey && signingPassword) {
+			useInMemoryPgpKeys(signingKey, signingPassword)
             sign publishing.publications.mavenJava
-        }
-    }
+		}
+	}
 
-    javadoc {
-        if (JavaVersion.current().isJava9Compatible()) {
-            options.addBooleanOption('html5', true)
-        }
-    }
-
-    repositories {
-        if (System.getenv("OPENSOURCE_PUBLISH") == "true") {
-            maven {
-                url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-                credentials {
-                    username sonatypeUsername
-                    password sonatypePassword
-                }
-            }
-        }
-        else{
-            maven {
-                url "https://arti.tw.ee/artifactory/libs-${project.version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release'}-local"
-                credentials {
-                    username = artifactoryUser
-                    password = artifactoryPassword
-                }
-            }
-        }
-    }
+	repositories {
+		maven {
+			url System.env.MAVEN_URL as String
+			credentials {
+				username = System.env.MAVEN_USER as String
+				password = System.env.MAVEN_PASSWORD as String
+			}
+		}
+	}
 }
 
 test {

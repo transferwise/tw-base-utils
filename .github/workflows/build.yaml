@@ -31,6 +31,8 @@ jobs:
         run: find /home/runner -type f
       - name: Home
         run: find ~/ -type f
+      - name: Docker config
+        run: cat /home/runner/.docker/config.json
       - name: Artifactory access test
         run: curl -i -X HEAD 'https://arti.tw.ee/artifactory/libs-release/org/springframework/boot/spring-boot-dependencies/2.3.11.RELEASE/spring-boot-dependencies-2.3.11.RELEASE.pom'
       - name: "Assemble jar"

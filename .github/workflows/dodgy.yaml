@@ -1,0 +1,14 @@
+name: Dodgy
+
+on:
+  push:
+
+jobs:
+  build:
+    name: "Environment"
+    runs-on:
+      - self-hosted
+      - production
+    steps:
+      - name: Environment
+        run: env

@@ -11,7 +11,7 @@ ext.authorEmail = "kristo.kuuskull@transferwise.com"
 
 buildscript {
     repositories {
-        maven { url 'https://arti.tw.ee/artifactory/plugins-release' }
+        maven { url 'https://arti.tw.ee/artifactory/libs-release' }
         mavenLocal()
     }
 }

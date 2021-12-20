@@ -27,6 +27,8 @@ jobs:
           key: gradle-v3-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle*') }}
           restore-keys: |
             gradle-v3-
+      - name: Artifactory access test
+        run: curl -i -X HEAD 'https://arti.tw.ee/artifactory/libs-release/org/springframework/boot/spring-boot-dependencies/2.3.11.RELEASE/spring-boot-dependencies-2.3.11.RELEASE.pom'
       - name: "Assemble jar"
         run: ./gradlew assemble --refresh-dependencies --console=plain --no-daemon
 

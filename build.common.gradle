@@ -11,8 +11,7 @@ ext.authorEmail = "kristo.kuuskull@transferwise.com"
 
 buildscript {
     repositories {
-        mavenCentral()
-        mavenLocal()
+        maven { url 'https://arti.tw.ee/artifactory/libs-release' }
     }
 }
 
@@ -27,8 +26,7 @@ apply plugin: "signing"
 group = "com.transferwise.common"
 
 repositories {
-    mavenCentral()
-    mavenLocal()
+    maven { url 'https://arti.tw.ee/artifactory/libs-release' }
 }
 
 dependencies {

@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 ext.projectGitHubRepoName = "tw-base-utils"
 ext.projectScmUrl = "https://github.com/transferwise/${projectGitHubRepoName}"
 ext.projectScmConnection = "scm:git:git://github.com/transferwise/${projectGitHubRepoName}.git"
-ext.springBootVersion = "2.3.11.RELEASE"
+ext.springBootVersion = "2.5.8"
 ext.authorName = "Kristo Kuuskül"
 ext.authorGithub = "onukristo"
 ext.authorEmail = "kristo.kuuskull@transferwise.com"
@@ -80,61 +80,58 @@ compileTestJava {
 }
 
 publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-			afterEvaluate {
-				artifactId = projectArtifactName
-			}
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            afterEvaluate {
+                artifactId = projectArtifactName
+            }
 
-			pom {
-				name = projectName
-				description = projectDescription
-				url = projectScmUrl
-				packaging = "jar"
-				licenses {
-					license {
-						name = 'The Apache License, Version 2.0, Copyright 2019 TransferWise Ltd'
-						url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-					}
-				}
-				developers {
-					developer {
-						id = authorGithub
-						name = authorName
-						email = authorEmail
-						organization = "Transferwise Ltd"
-						organizationUrl = "https://github.com/transferwise"
-					}
-				}
-				scm {
-					connection = projectScmConnection
-					developerConnection = projectScmConnection
-					url = projectScmUrl
-				}
-			}
-		}
-	}
+            pom {
+                name = projectName
+                description = projectDescription
+                url = projectScmUrl
+                packaging = "jar"
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0, Copyright 2019 TransferWise Ltd'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = authorGithub
+                        name = authorName
+                        email = authorEmail
+                        organization = "Transferwise Ltd"
+                        organizationUrl = "https://github.com/transferwise"
+                    }
+                }
+                scm {
+                    connection = projectScmConnection
+                    developerConnection = projectScmConnection
+                    url = projectScmUrl
+                }
+            }
+        }
+    }
 
-	signing {
-		def signingKey = System.env.OSS_SIGNING_KEY as String
-		def signingPassword = System.env.OSS_SIGNING_PASSWORD as String
-
-		if (signingKey && signingPassword) {
-			useInMemoryPgpKeys(signingKey, signingPassword)
+    if (System.getenv("OSS_SIGNING_KEY")) {
+        signing {
+            useInMemoryPgpKeys(System.getenv("OSS_SIGNING_KEY"), System.getenv("OSS_SIGNING_PASSWORD"))
             sign publishing.publications.mavenJava
-		}
-	}
+        }
+    }
 
-	repositories {
-		maven {
-			url System.env.MAVEN_URL as String
-			credentials {
-				username = System.env.MAVEN_USER as String
-				password = System.env.MAVEN_PASSWORD as String
-			}
-		}
-	}
+    repositories {
+        maven {
+            url System.getenv("MAVEN_URL")
+            credentials {
+                username = System.getenv("MAVEN_USER")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
+    }
 }
 
 test {
@@ -155,8 +152,8 @@ tasks.findAll { it.name.startsWith("spotbugs") }*.configure {
     effort = "max"
 
     reports {
-        xml.enabled false
-        html.enabled true
+        xml.required = true
+        html.required = true
     }
 }
 
@@ -173,16 +170,7 @@ tasks.withType(Checkstyle) {
     maxWarnings = 0
 
     reports {
-        xml.enabled false
-        html.enabled true
+        xml.required = true
+        html.required = true
     }
 }
-
-task addTag(type: Exec) {
-    commandLine 'git', 'tag', "$project.name-$project.version", '-m', "$project.name-$project.version"
-}
-task pushTag(type: Exec) {
-    commandLine 'git', 'push', 'origin', "$project.name-$project.version"
-}
-
-pushTag.dependsOn addTag

@@ -24,9 +24,8 @@ jobs:
         with:
           path: |
             ~/.gradle
-          key: gradle-v3-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle*') }}
-          restore-keys: |
-            gradle-v3-
+          key: gradle-v1-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle*') }}
+
       - name: "Assemble jar"
         run: ./gradlew assemble --refresh-dependencies --console=plain --no-daemon
 

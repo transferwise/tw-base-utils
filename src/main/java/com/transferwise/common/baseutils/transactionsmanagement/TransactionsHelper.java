@@ -1,6 +1,7 @@
 package com.transferwise.common.baseutils.transactionsmanagement;
 
 import com.transferwise.common.baseutils.ExceptionUtils;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +114,7 @@ public class TransactionsHelper implements ITransactionsHelper {
           try {
             transactionManager.rollback(status);
           } catch (Throwable t2) {
-            log.error(t2.getMessage(), t2);
+            log.error("Failed to rollback transaction '{}' ({}).", name != null ? name : "<no-txn-name>", def, t2);
           }
           throw t;
         }

@@ -1,7 +1,9 @@
 package com.transferwise.common.baseutils.transactionsmanagement;
 
 import com.transferwise.common.baseutils.ExceptionUtils;
+import java.util.Optional;
 import java.util.concurrent.Callable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -9,6 +11,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+@Slf4j
 public class TransactionsHelper implements ITransactionsHelper {
 
   @Autowired
@@ -108,7 +111,11 @@ public class TransactionsHelper implements ITransactionsHelper {
         try {
           result = callable.call();
         } catch (Throwable t) {
-          transactionManager.rollback(status);
+          try {
+            transactionManager.rollback(status);
+          } catch (Throwable t2) {
+            log.error("Failed to rollback transaction '{}' ({}).", name != null ? name : "<no-txn-name>", def, t2);
+          }
           throw t;
         }
         transactionManager.commit(status);

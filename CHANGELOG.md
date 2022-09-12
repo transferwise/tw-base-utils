@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2022-09-12
+### Changed
+* If the Callable supplied to TransactionHelper#call throws an exception, there is an attempt to rollback. Thus far, if the rollback also threw an
+exception, it got thrown and the exception from Callable was lost. Starting in this version, any exception from the rollback is caught and logged,
+and the exception from Callable gets thrown.
+
 ## [1.7.1] - 2021-12-08
 ### Changed
 * Build and Publish using GitHub Actions

@@ -31,11 +31,33 @@ repositories {
     mavenLocal()
 }
 
+configurations {
+    local {
+        canBeResolved(false)
+        canBeConsumed(false)
+    }
+    compileClasspath {
+        extendsFrom(local)
+    }
+    runtimeClasspath {
+        extendsFrom(local)
+    }
+    testCompileClasspath {
+        extendsFrom(local)
+    }
+    testRuntimeClasspath {
+        extendsFrom(local)
+    }
+    annotationProcessor {
+        extendsFrom(local)
+    }
+    testAnnotationProcessor {
+        extendsFrom(local)
+    }
+}
+
 dependencies {
-    annotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
-    compileOnly(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
-    testAnnotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
+    local(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
 
     annotationProcessor("org.projectlombok:lombok")
 
@@ -85,6 +107,19 @@ publishing {
             from components.java
             afterEvaluate {
                 artifactId = projectArtifactName
+            }
+
+            /*
+             This ensures that libraries will have explicit dependency versions in their Maven POM and Gradle module files, so that there would be less
+             ambiguity and less chances of dependency conflicts.
+            */
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionOf('runtimeClasspath')
+                }
             }
 
             pom {
@@ -150,6 +185,8 @@ test {
 
 tasks.findAll { it.name.startsWith("spotbugs") }*.configure {
     effort = "max"
+
+    excludeFilter = file('spotbugs-exclude.xml')
 
     reports {
         xml.required = true

@@ -85,10 +85,10 @@ public class ThreadNamingExecutorServiceWrapper implements ExecutorService {
 
   @Override
   public void execute(Runnable command) {
-    delegate.execute(command);
+    delegate.execute(wrap(command));
   }
 
-  private <T> Collection<? extends Callable<T>> wrap(Collection<? extends Callable<T>> tasks) {
+  protected <T> Collection<? extends Callable<T>> wrap(Collection<? extends Callable<T>> tasks) {
     return tasks.stream().map(this::wrap).collect(Collectors.toList());
   }
 

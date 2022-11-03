@@ -33,8 +33,6 @@ dependencies {
     testImplementation 'org.awaitility:awaitility:4.2.0'
     testImplementation 'io.micrometer:micrometer-core'
     testImplementation 'org.assertj:assertj-core'
-
-    //testRuntimeOnly "org.junit.vintage:junit-vintage-engine"
 }
 
 test {

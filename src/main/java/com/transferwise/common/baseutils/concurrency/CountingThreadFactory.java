@@ -12,9 +12,7 @@ public class CountingThreadFactory implements ThreadFactory {
   public CountingThreadFactory(String groupName) {
     this.groupName = groupName;
 
-    SecurityManager s = System.getSecurityManager();
-    group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-
+    group = Thread.currentThread().getThreadGroup();
   }
 
   public Thread newThread(Runnable r) {

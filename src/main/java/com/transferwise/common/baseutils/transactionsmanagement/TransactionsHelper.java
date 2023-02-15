@@ -1,7 +1,6 @@
 package com.transferwise.common.baseutils.transactionsmanagement;
 
 import com.transferwise.common.baseutils.ExceptionUtils;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

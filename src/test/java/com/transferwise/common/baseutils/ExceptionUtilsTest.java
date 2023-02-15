@@ -1,8 +1,8 @@
 package com.transferwise.common.baseutils;
 
 import static com.transferwise.common.baseutils.ExceptionUtils.doUnchecked;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
@@ -10,10 +10,10 @@ import java.util.concurrent.Callable;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
-public class ExceptionUtilsTest extends BaseTest {
+class ExceptionUtilsTest extends BaseTest {
 
   @Test
-  public void testUncheckedCall() {
+  void testUncheckedCall() {
     //Given
     final Throwable myT = new Throwable("1");
     RuntimeException myRe = new RuntimeException("Ahoy");

@@ -1,6 +1,6 @@
 package com.transferwise.common.baseutils.tracing;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.transferwise.common.baseutils.BaseTest;
 import org.junit.jupiter.api.Test;

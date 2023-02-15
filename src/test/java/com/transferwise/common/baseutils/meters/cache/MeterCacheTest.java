@@ -1,6 +1,9 @@
 package com.transferwise.common.baseutils.meters.cache;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -10,7 +13,7 @@ import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class MeterCacheTest {
+class MeterCacheTest {
 
   private MeterRegistry meterRegistry;
   private MeterCache meterCache;
@@ -22,99 +25,102 @@ public class MeterCacheTest {
   }
 
   @Test
-  public void counterCacheWorksWithNoTags() {
+  void counterCacheWorksWithNoTags() {
     var counterName = "my.test.counter";
     var counter0 = meterCache.counter(counterName, TagsSet.empty());
     var counter1 = meterCache.counter(counterName, TagsSet.empty());
     var counter2 = meterRegistry.counter(counterName);
 
-    assertThat(counter0).isSameAs(counter1);
-    assertThat(counter0).isSameAs(counter2);
+    assertSame(counter0, counter1);
+    assertSame(counter0, counter2);
 
     meterCache.clear();
-    assertThat(meterCache.size()).isEqualTo(0);
+    assertEquals(0, meterCache.size());
 
     var counter3 = meterCache.counter(counterName, TagsSet.empty());
-    assertThat(counter0).isSameAs(counter3);
+    assertSame(counter0, counter3);
 
     // Important to understand, that clearing the meterRegistry does not clear the cache.
     meterRegistry.clear();
     var counter4 = meterCache.counter(counterName, TagsSet.empty());
-    assertThat(counter0).isSameAs(counter4);
+    assertSame(counter0, counter4);
 
     meterRegistry.clear();
     meterCache.clear();
 
     var counter5 = meterCache.counter(counterName, TagsSet.empty());
-    assertThat(counter0).isNotSameAs(counter5);
+    assertNotSame(counter0, counter5);
   }
 
   @Test
-  public void counterCacheWorksWithTags() {
-    var tag0 = Tag.of("tag0", "tagValue0");
-    var tag1 = Tag.of("tag1", "tagValue1");
-    var tag2 = Tag.of("tag2", "tagValue2");
-    var counterName = "my.test.counter";
+  void counterCacheWorksWithTags() {
+    final var tag0 = Tag.of("tag0", "tagValue0");
+    final var tag1 = Tag.of("tag1", "tagValue1");
+    final var tag2 = Tag.of("tag2", "tagValue2");
+    final var counterName = "my.test.counter";
 
     var counter0 = meterCache.counter(counterName, TagsSet.of(tag0, tag1));
     var counter1 = meterCache.counter(counterName, TagsSet.of(tag0, tag1));
 
-    assertThat(counter0).isSameAs(counter1);
-    assertThat(meterCache.size()).isEqualTo(1);
+    assertSame(counter0, counter1);
+    assertEquals(1, meterCache.size());
 
     var counter2 = meterCache.counter(counterName, TagsSet.of(tag1, tag0));
-    assertThat(counter0).as("Even when cache is different, the underlying meterRegistry provides same counter.").isSameAs(counter2);
-    assertThat(meterCache.size()).isEqualTo(2);
+    //Even when cache is different, the underlying meterRegistry provides same counter.
+    assertSame(counter0, counter2);
+    assertEquals(2, meterCache.size());
 
     var counter3 = meterCache.counter(counterName, TagsSet.of(tag0, tag1, tag2));
-    assertThat(counter0).isNotSameAs(counter3);
-    assertThat(meterCache.size()).isEqualTo(3);
+    assertNotSame(counter0, counter3);
+    assertEquals(3, meterCache.size());
 
     var counter4 = meterCache.counter(counterName, TagsSet.of("tag0", "tagValue0", "tag1", "tagValue1"));
-    assertThat(counter0).as("Even when cache is different, the underlying meterRegistry provides same counter.").isSameAs(counter4);
-    assertThat(meterCache.size()).isEqualTo(4);
+    //Even when cache is different, the underlying meterRegistry provides same counter.
+    assertSame(counter0, counter4);
+    assertEquals(4, meterCache.size());
 
     var counter5 = meterCache.counter(counterName, TagsSet.of("tag0", "tagValue0", "tag1", "tagValue1"));
-    assertThat(counter4).isSameAs(counter5);
-    assertThat(meterCache.size()).isEqualTo(4);
+    assertSame(counter4, counter5);
+    assertEquals(4, meterCache.size());
   }
 
   @Test
-  public void distributionSummaryCanBeUsed() {
+  void distributionSummaryCanBeUsed() {
     meterCache.summary("my.summary", TagsSet.of("a", "av")).record(10);
-    assertThat(meterRegistry.summary("my.summary", "a", "av").count()).isEqualTo(1);
+    assertEquals(1, meterRegistry.summary("my.summary", "a", "av").count());
   }
 
   @Test
-  public void timerCanBeUsed() {
+  void timerCanBeUsed() {
     meterCache.timer("my.timer", TagsSet.of("a", "av")).record(Duration.ZERO);
-    assertThat(meterRegistry.timer("my.timer", "a", "av").count()).isEqualTo(1);
+    assertEquals(1, meterRegistry.timer("my.timer", "a", "av").count());
   }
 
   @Test
-  public void meterContainersCanBeUsed() {
+  void meterContainersCanBeUsed() {
     meterCache.metersContainer("name", TagsSet.of("a", "av"), () -> "Hello World");
-    assertThat(meterCache.metersContainer("name", TagsSet.of("a", "av"), () -> "Hello World 1")).isEqualTo("Hello World");
-    assertThat(meterCache.size()).isEqualTo(1);
+    assertEquals("Hello World", meterCache.metersContainer("name", TagsSet.of("a", "av"), () -> "Hello World 1"));
+    assertEquals(1, meterCache.size());
 
     meterCache.clear();
     String metersContainer = meterCache.metersContainer("name", TagsSet.of("a", "av"), () -> "Hello World 1");
-    assertThat(metersContainer).isEqualTo("Hello World 1");
+    assertEquals("Hello World 1", metersContainer);
 
-    assertThat(meterCache.removeMetersContainer("name", TagsSet.of("a", "av"))).isSameAs(metersContainer);
-    assertThat(meterCache.size()).isEqualTo(0);
+    assertSame(meterCache.removeMetersContainer("name", TagsSet.of("a", "av")), metersContainer);
+    assertEquals(0, meterCache.size());
   }
 
   @Test
-  public void specificMeterCanBeRemovedFromCache() {
+  void specificMeterCanBeRemovedFromCache() {
     Timer timer0 = meterCache.timer("my.timer.0", TagsSet.of("a", "av0"));
     meterCache.timer("my.timer.0", TagsSet.of("a", "av1"));
-    assertThat(meterCache.size()).isEqualTo(2);
-    assertThat(meterCache.removeMeter("my.timer.0", TagsSet.of("a", "av0"))).isSameAs(timer0);
-    assertThat(meterCache.size()).isEqualTo(1);
-    assertThat(meterCache.removeMeter("my.timer.0", TagsSet.of("a", "av0"))).isNull();
+    assertEquals(2, meterCache.size());
+    assertSame(meterCache.removeMeter("my.timer.0", TagsSet.of("a", "av0")), timer0);
+    assertEquals(1, meterCache.size());
+    assertNull(meterCache.removeMeter("my.timer.0", TagsSet.of("a", "av0")));
 
-    assertThat(meterCache.timer("my.timer.0", TagsSet.of("a", "av0"))).as("Underlying meter is still present in meter registry").isSameAs(timer0);
+    //Underlying meter is still present in meter registry
+    assertSame(meterCache.timer("my.timer.0", TagsSet.of("a", "av0")), timer0);
   }
 
 }

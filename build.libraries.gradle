@@ -1,0 +1,22 @@
+ext {
+    springBootVersion = "${System.getenv("SPRING_BOOT_VERSION") ?: "2.6.14"}"
+    libraries = [
+            // version defined
+            awaitility            : "org.awaitility:awaitility:4.2.0",
+            spockCore             : "org.spockframework:spock-core:2.3-groovy-4.0",
+            spotbugsAnnotations   : "com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}",
+            springBootDependencies: "org.springframework.boot:spring-boot-dependencies:${springBootVersion}",
+
+            // versions managed by spring-boot-dependencies platform
+            commonsLang3          : "org.apache.commons:commons-lang3",
+            guava                 : 'com.google.guava:guava:31.1-jre',
+            junitJupiter          : "org.junit.jupiter:junit-jupiter",
+            logbackClassic        : "ch.qos.logback:logback-classic",
+            lombok                : "org.projectlombok:lombok",
+            micrometerCore        : "io.micrometer:micrometer-core",
+            slf4jApi              : "org.slf4j:slf4j-api",
+            springBootStarter     : "org.springframework.boot:spring-boot-starter",
+            springTx              : "org.springframework:spring-tx",
+
+    ]
+}

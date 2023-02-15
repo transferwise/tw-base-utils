@@ -4,7 +4,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 ext.projectGitHubRepoName = "tw-base-utils"
 ext.projectScmUrl = "https://github.com/transferwise/${projectGitHubRepoName}"
 ext.projectScmConnection = "scm:git:git://github.com/transferwise/${projectGitHubRepoName}.git"
-ext.springBootVersion = "2.5.8"
 ext.authorName = "Kristo Kuuskül"
 ext.authorGithub = "onukristo"
 ext.authorEmail = "kristo.kuuskull@transferwise.com"
@@ -15,6 +14,8 @@ buildscript {
         mavenLocal()
     }
 }
+
+apply from: "$rootProject.rootDir/build.libraries.gradle"
 
 apply plugin: "java-library"
 apply plugin: "maven-publish"
@@ -57,17 +58,11 @@ configurations {
 }
 
 dependencies {
-    local(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
+    local(platform(libraries.springBootDependencies))
 
-    annotationProcessor("org.projectlombok:lombok")
+    local(libraries.lombok)
 
-    compileOnly("org.projectlombok:lombok")
-
-    testAnnotationProcessor("org.projectlombok:lombok")
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.projectlombok:lombok")
-    testImplementation 'ch.qos.logback:logback-classic'
-    testImplementation 'org.assertj:assertj-core'
+    compileOnly libraries.spotbugsAnnotations
 }
 
 java {
@@ -91,14 +86,20 @@ compileJava {
     options.compilerArgs << '-parameters'
     options.compilerArgs << '-Xlint'
     options.compilerArgs << '-Xlint:-processing'
+
+    options.fork = true
+    options.forkOptions.jvmArgs << '-Xmx256m'
 }
 
 compileTestJava {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
     javaCompiler = javaToolchains.compilerFor {
-        languageVersion = JavaLanguageVersion.of(15)
+        languageVersion = JavaLanguageVersion.of(17)
     }
+
+    options.fork = true
+    options.forkOptions.jvmArgs << '-Xmx256m'
 }
 
 publishing {
@@ -171,7 +172,7 @@ publishing {
 
 test {
     javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(15)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 
     testLogging {

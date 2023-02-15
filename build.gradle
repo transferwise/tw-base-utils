@@ -20,19 +20,18 @@ ext.projectArtifactName = "tw-base-utils"
 apply from: 'build.common.gradle'
 
 dependencies {
-    compileOnly 'org.springframework.boot:spring-boot-starter'
-    compileOnly 'org.springframework:spring-tx'
-    compileOnly 'com.github.spotbugs:spotbugs-annotations:4.7.3'
-    compileOnly 'io.micrometer:micrometer-core'
+    compileOnly libraries.springBootStarter
+    compileOnly libraries.springTx
+    compileOnly libraries.micrometerCore
 
-    implementation 'org.slf4j:slf4j-api'
-    implementation 'org.apache.commons:commons-lang3'
+    implementation libraries.commonsLang3
+    implementation libraries.slf4jApi
 
-    testImplementation 'junit:junit'
-    testImplementation 'org.spockframework:spock-core:2.3-groovy-3.0'
-    testImplementation 'org.awaitility:awaitility:4.2.0'
-    testImplementation 'io.micrometer:micrometer-core'
-    testImplementation 'org.assertj:assertj-core'
+    testImplementation libraries.awaitility
+    testImplementation libraries.guava
+    testImplementation libraries.junitJupiter
+    testImplementation libraries.micrometerCore
+    testImplementation libraries.spockCore
 }
 
 test {

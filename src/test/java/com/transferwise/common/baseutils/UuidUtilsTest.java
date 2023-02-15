@@ -1,20 +1,23 @@
 package com.transferwise.common.baseutils;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.common.collect.Ordering;
 import com.transferwise.common.baseutils.clock.TestClock;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.lang3.RandomUtils;
-import org.assertj.core.util.Sets;
 import org.junit.jupiter.api.Test;
 
-public class UuidUtilsTest extends BaseTest {
+class UuidUtilsTest extends BaseTest {
 
   @Test
-  public void defaultPrefixCombUuidIsGrowingOverTime() {
+  void defaultPrefixCombUuidIsGrowingOverTime() {
     TestClock clock = TestClock.createAndRegister();
 
     int n = 100;
@@ -30,20 +33,20 @@ public class UuidUtilsTest extends BaseTest {
       long time = uuids[i].getMostSignificantBits() >>> (64 - 38);
 
       if (previousTime != -1) {
-        assertThat(previousTime).isLessThan(time);
+        assertTrue(previousTime < time);
       }
       previousTime = time;
 
       System.out.println(uuids[i]);
-      assertThat(uuids[i].version()).isEqualTo(4);
+      assertEquals(4, uuids[i].version());
     }
 
-    assertThat(uuids).isSorted();
-    assertThat(Sets.newTreeSet(uuids).size()).isEqualTo(n);
+    assertTrue(Ordering.natural().isOrdered(Arrays.asList(uuids)));
+    assertEquals(n, Set.of(uuids).size());
   }
 
   @Test
-  public void convertingFromUuidAndBackToBytesEndWithTheSameResult() {
+  void convertingFromUuidAndBackToBytesEndWithTheSameResult() {
     UUID expected = UUID.randomUUID();
 
     byte[] bytes = UuidUtils.toBytes(expected);
@@ -53,7 +56,7 @@ public class UuidUtilsTest extends BaseTest {
   }
 
   @Test
-  public void convertingFromBytesAndBackToUuidEndWithTheSameResult() {
+  void convertingFromBytesAndBackToUuidEndWithTheSameResult() {
     byte[] expected = RandomUtils.nextBytes(16);
 
     UUID uuid = UuidUtils.toUuid(expected);
@@ -63,8 +66,8 @@ public class UuidUtilsTest extends BaseTest {
   }
 
   @Test
-  public void generatingSecuredUuidWorks() {
-    assertThat(UuidUtils.generateSecureUuid()).isNotNull();
+  void generatingSecuredUuidWorks() {
+    assertNotNull(UuidUtils.generateSecureUuid());
   }
 
 }

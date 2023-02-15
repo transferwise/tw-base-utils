@@ -1,13 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
-ext.projectGitHubRepoName = "tw-base-utils"
-ext.projectScmUrl = "https://github.com/transferwise/${projectGitHubRepoName}"
-ext.projectScmConnection = "scm:git:git://github.com/transferwise/${projectGitHubRepoName}.git"
-ext.authorName = "Kristo Kuuskül"
-ext.authorGithub = "onukristo"
-ext.authorEmail = "kristo.kuuskull@transferwise.com"
-
 buildscript {
     repositories {
         mavenCentral()
@@ -18,12 +11,10 @@ buildscript {
 apply from: "$rootProject.rootDir/build.libraries.gradle"
 
 apply plugin: "java-library"
-apply plugin: "maven-publish"
 apply plugin: "checkstyle"
 apply plugin: "idea"
 apply plugin: "com.github.spotbugs"
 apply plugin: "groovy"
-apply plugin: "signing"
 
 group = "com.transferwise.common"
 
@@ -102,78 +93,12 @@ compileTestJava {
     options.forkOptions.jvmArgs << '-Xmx256m'
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            afterEvaluate {
-                artifactId = projectArtifactName
-            }
-
-            /*
-             This ensures that libraries will have explicit dependency versions in their Maven POM and Gradle module files, so that there would be less
-             ambiguity and less chances of dependency conflicts.
-            */
-            versionMapping {
-                usage('java-api') {
-                    fromResolutionOf('runtimeClasspath')
-                }
-                usage('java-runtime') {
-                    fromResolutionOf('runtimeClasspath')
-                }
-            }
-
-            pom {
-                name = projectName
-                description = projectDescription
-                url = projectScmUrl
-                packaging = "jar"
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0, Copyright 2019 TransferWise Ltd'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = authorGithub
-                        name = authorName
-                        email = authorEmail
-                        organization = "Transferwise Ltd"
-                        organizationUrl = "https://github.com/transferwise"
-                    }
-                }
-                scm {
-                    connection = projectScmConnection
-                    developerConnection = projectScmConnection
-                    url = projectScmUrl
-                }
-            }
-        }
-    }
-
-    if (System.getenv("OSS_SIGNING_KEY")) {
-        signing {
-            useInMemoryPgpKeys(System.getenv("OSS_SIGNING_KEY"), System.getenv("OSS_SIGNING_PASSWORD"))
-            sign publishing.publications.mavenJava
-        }
-    }
-
-    repositories {
-        maven {
-            url System.getenv("MAVEN_URL")
-            credentials {
-                username = System.getenv("MAVEN_USER")
-                password = System.getenv("MAVEN_PASSWORD")
-            }
-        }
-    }
-}
-
 test {
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(17)
     }
+
+    useJUnitPlatform()
 
     testLogging {
         events TestLogEvent.STARTED, TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED,

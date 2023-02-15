@@ -1,1 +1,3 @@
 rootProject.name = 'tw-base-utils'
+
+include 'tw-base-utils'

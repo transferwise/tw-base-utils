@@ -1,0 +1,19 @@
+ext.projectArtifactName = "tw-base-utils"
+
+apply from: "$rootProject.rootDir/build.common.gradle"
+apply from: "$rootProject.rootDir/build.library.gradle"
+
+dependencies {
+    compileOnly libraries.springBootStarter
+    compileOnly libraries.springTx
+    compileOnly libraries.micrometerCore
+
+    implementation libraries.commonsLang3
+    implementation libraries.slf4jApi
+
+    testImplementation libraries.awaitility
+    testImplementation libraries.guava
+    testImplementation libraries.junitJupiter
+    testImplementation libraries.micrometerCore
+    testImplementation libraries.spockCore
+}

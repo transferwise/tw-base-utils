@@ -30,7 +30,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: current
+          gradle-version: 8.0
           gradle-home-cache-cleanup: true
           # Comment out when you are upgrading gradle in a branch and doing tons of commits you would need to test.
           # cache-read-only: false
@@ -41,7 +41,7 @@ jobs:
       - name: "Compile tests"
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: compileTest --console=plain --info --stacktrace --parallel
+          arguments: compileTestJava compileTestGroovy --console=plain --info --stacktrace --parallel
       - name: "Run checks"
         uses: gradle/gradle-build-action@v2
         with:

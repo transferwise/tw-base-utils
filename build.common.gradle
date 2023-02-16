@@ -1,14 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
-ext.projectGitHubRepoName = "tw-base-utils"
-ext.projectScmUrl = "https://github.com/transferwise/${projectGitHubRepoName}"
-ext.projectScmConnection = "scm:git:git://github.com/transferwise/${projectGitHubRepoName}.git"
-ext.springBootVersion = "2.5.8"
-ext.authorName = "Kristo Kuuskül"
-ext.authorGithub = "onukristo"
-ext.authorEmail = "kristo.kuuskull@transferwise.com"
-
 buildscript {
     repositories {
         mavenCentral()
@@ -16,13 +8,13 @@ buildscript {
     }
 }
 
+apply from: "$rootProject.rootDir/build.libraries.gradle"
+
 apply plugin: "java-library"
-apply plugin: "maven-publish"
 apply plugin: "checkstyle"
 apply plugin: "idea"
 apply plugin: "com.github.spotbugs"
 apply plugin: "groovy"
-apply plugin: "signing"
 
 group = "com.transferwise.common"
 
@@ -57,17 +49,11 @@ configurations {
 }
 
 dependencies {
-    local(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
+    local(platform(libraries.springBootDependencies))
 
-    annotationProcessor("org.projectlombok:lombok")
+    local(libraries.lombok)
 
-    compileOnly("org.projectlombok:lombok")
-
-    testAnnotationProcessor("org.projectlombok:lombok")
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.projectlombok:lombok")
-    testImplementation 'ch.qos.logback:logback-classic'
-    testImplementation 'org.assertj:assertj-core'
+    compileOnly libraries.spotbugsAnnotations
 }
 
 java {
@@ -91,88 +77,28 @@ compileJava {
     options.compilerArgs << '-parameters'
     options.compilerArgs << '-Xlint'
     options.compilerArgs << '-Xlint:-processing'
+
+    options.fork = true
+    options.forkOptions.jvmArgs << '-Xmx256m'
 }
 
 compileTestJava {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
     javaCompiler = javaToolchains.compilerFor {
-        languageVersion = JavaLanguageVersion.of(15)
-    }
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            afterEvaluate {
-                artifactId = projectArtifactName
-            }
-
-            /*
-             This ensures that libraries will have explicit dependency versions in their Maven POM and Gradle module files, so that there would be less
-             ambiguity and less chances of dependency conflicts.
-            */
-            versionMapping {
-                usage('java-api') {
-                    fromResolutionOf('runtimeClasspath')
-                }
-                usage('java-runtime') {
-                    fromResolutionOf('runtimeClasspath')
-                }
-            }
-
-            pom {
-                name = projectName
-                description = projectDescription
-                url = projectScmUrl
-                packaging = "jar"
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0, Copyright 2019 TransferWise Ltd'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = authorGithub
-                        name = authorName
-                        email = authorEmail
-                        organization = "Transferwise Ltd"
-                        organizationUrl = "https://github.com/transferwise"
-                    }
-                }
-                scm {
-                    connection = projectScmConnection
-                    developerConnection = projectScmConnection
-                    url = projectScmUrl
-                }
-            }
-        }
+        languageVersion = JavaLanguageVersion.of(17)
     }
 
-    if (System.getenv("OSS_SIGNING_KEY")) {
-        signing {
-            useInMemoryPgpKeys(System.getenv("OSS_SIGNING_KEY"), System.getenv("OSS_SIGNING_PASSWORD"))
-            sign publishing.publications.mavenJava
-        }
-    }
-
-    repositories {
-        maven {
-            url System.getenv("MAVEN_URL")
-            credentials {
-                username = System.getenv("MAVEN_USER")
-                password = System.getenv("MAVEN_PASSWORD")
-            }
-        }
-    }
+    options.fork = true
+    options.forkOptions.jvmArgs << '-Xmx256m'
 }
 
 test {
     javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(15)
+        languageVersion = JavaLanguageVersion.of(17)
     }
+
+    useJUnitPlatform()
 
     testLogging {
         events TestLogEvent.STARTED, TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED,
@@ -186,7 +112,7 @@ test {
 tasks.findAll { it.name.startsWith("spotbugs") }*.configure {
     effort = "max"
 
-    excludeFilter = file('spotbugs-exclude.xml')
+    excludeFilter = file("$rootProject.rootDir/spotbugs-exclude.xml")
 
     reports {
         xml.required = true
@@ -199,7 +125,7 @@ spotbugs {
 }
 
 tasks.withType(Checkstyle) {
-    config = resources.text.fromFile(file('google_checks.xml'))
+    config = resources.text.fromFile(file("$rootProject.rootDir/google_checks.xml"))
 
     // Deprecated, checkstyle does not like the namings.
     exclude "com/transferwise/common/baseutils/tracing/**"

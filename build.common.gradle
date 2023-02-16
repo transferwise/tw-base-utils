@@ -112,7 +112,7 @@ test {
 tasks.findAll { it.name.startsWith("spotbugs") }*.configure {
     effort = "max"
 
-    excludeFilter = file('spotbugs-exclude.xml')
+    excludeFilter = file("$rootProject.rootDir/spotbugs-exclude.xml")
 
     reports {
         xml.required = true
@@ -125,7 +125,7 @@ spotbugs {
 }
 
 tasks.withType(Checkstyle) {
-    config = resources.text.fromFile(file('google_checks.xml'))
+    config = resources.text.fromFile(file("$rootProject.rootDir/google_checks.xml"))
 
     // Deprecated, checkstyle does not like the namings.
     exclude "com/transferwise/common/baseutils/tracing/**"

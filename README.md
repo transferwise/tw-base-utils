@@ -13,6 +13,9 @@ Should be kept TransferWise domain-free.
 
 The end goal is to not have this kind of library and instead rely on Java language improvements and other open source libraries.
 
+## 📚 Documentation
+Documentation can be found in the [docs](docs/) directory, or if you're a Wiser, on the [developer portal](https://dev.tw.ee/docs/default/Component/tw-base-utils).
+
 ## License
 Copyright 2021 TransferWise Ltd.
 

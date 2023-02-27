@@ -1,0 +1,7 @@
+site_name: tw-base-utils Documentation
+repo_url: https://github.com/transferwise/tw-base-utils
+edit_uri: blob/master/docs/
+nav:
+  - Overview: index.md
+  - Usage: usage.md
+  - Contributing: contributing.md

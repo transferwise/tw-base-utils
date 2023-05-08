@@ -27,29 +27,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/gradle-build-action@v2
         with:
           gradle-home-cache-cleanup: true
           # Comment out when you are upgrading gradle in a branch and doing tons of commits you would need to test.
           # cache-read-only: false
       - name: "Assemble jar"
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: assemble --console=plain --info --stacktrace --parallel
       - name: "Compile tests"
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: compileTestJava compileTestGroovy --console=plain --info --stacktrace --parallel
       - name: "Run checks"
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: check -x test --console=plain --stacktrace
       - name: "Run tests"
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: -Dspring.profiles.include=continuous-integration test --console=plain --info --stacktrace
       - name: "Test if publishing works"
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: publishToMavenLocal --console=plain --info --stacktrace
       - name: "Publish Test Report"
@@ -99,13 +99,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/gradle-build-action@v2
         with:
           gradle-home-cache-cleanup: true
           # Comment out when you are upgrading gradle in a branch and doing tons of commits you would need to test.
           # cache-read-only: false
       - name: "Tag release"
         if: github.ref == 'refs/heads/master'
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: tagRelease --console=plain --info --stacktrace

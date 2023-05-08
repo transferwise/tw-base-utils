@@ -16,6 +16,7 @@ public class DefaultExecutorServicesProvider implements IExecutorServicesProvide
 
   private Lock initializationLock = new ReentrantLock();
 
+  @Override
   public void afterPropertiesSet() {
     initializationLock.lock();
     try {
@@ -30,6 +31,7 @@ public class DefaultExecutorServicesProvider implements IExecutorServicesProvide
     }
   }
 
+  @Override
   public void destroy() {
     scheduledTaskExecutor.stop();
     executorService.shutdownNow();

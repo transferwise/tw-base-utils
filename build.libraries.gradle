@@ -10,6 +10,8 @@ ext {
             // versions managed by spring-boot-dependencies platform
             commonsLang3          : "org.apache.commons:commons-lang3",
             guava                 : 'com.google.guava:guava:31.1-jre',
+            jakartaValidationApi  : 'jakarta.validation:jakarta.validation-api',
+            javaxValidationApi    : "javax.validation:validation-api",
             junitJupiter          : "org.junit.jupiter:junit-jupiter",
             logbackClassic        : "ch.qos.logback:logback-classic",
             lombok                : "org.projectlombok:lombok",

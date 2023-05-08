@@ -46,6 +46,18 @@ configurations {
     testAnnotationProcessor {
         extendsFrom(local)
     }
+
+    all {
+        resolutionStrategy {
+            eachDependency { DependencyResolveDetails details ->
+                if (details.requested.group == "javax.validation" && details.requested.name == 'validation-api') {
+                    details.useVersion('2.0.1.Final')
+                } else if (details.requested.group == "jakarta.validation" && details.requested.name == 'jakarta.validation-api') {
+                    details.useVersion('3.0.2')
+                }
+            }
+        }
+    }
 }
 
 dependencies {

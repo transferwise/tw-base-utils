@@ -4,10 +4,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.PreDestroy;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-public class DefaultExecutorServicesProvider implements IExecutorServicesProvider, InitializingBean {
+public class DefaultExecutorServicesProvider implements IExecutorServicesProvider, InitializingBean, DisposableBean {
 
   private ExecutorService executorService;
   private ScheduledTaskExecutor scheduledTaskExecutor;
@@ -30,7 +30,6 @@ public class DefaultExecutorServicesProvider implements IExecutorServicesProvide
     }
   }
 
-  @PreDestroy
   public void destroy() {
     scheduledTaskExecutor.stop();
     executorService.shutdownNow();

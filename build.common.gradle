@@ -50,6 +50,8 @@ configurations {
     all {
         resolutionStrategy {
             eachDependency { DependencyResolveDetails details ->
+
+                // We need to fix those version in place, so we get only `javax` or `jakarta` packages in each.
                 if (details.requested.group == "javax.validation" && details.requested.name == 'validation-api') {
                     details.useVersion('2.0.1.Final')
                 } else if (details.requested.group == "jakarta.validation" && details.requested.name == 'jakarta.validation-api') {

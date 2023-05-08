@@ -8,13 +8,13 @@ buildscript {
     }
 }
 
-apply from: "$rootProject.rootDir/build.libraries.gradle"
-
 apply plugin: "java-library"
 apply plugin: "checkstyle"
 apply plugin: "idea"
 apply plugin: "com.github.spotbugs"
 apply plugin: "groovy"
+
+apply from: "$rootProject.rootDir/build.libraries.gradle"
 
 group = "com.transferwise.common"
 
@@ -57,8 +57,14 @@ dependencies {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    if (springBootVersion.startsWith("3.")) {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    else{
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
     withSourcesJar()
     withJavadocJar()
 }

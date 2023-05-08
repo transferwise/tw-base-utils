@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 * Support for Spring Boot 2.5
+* `@PostConstruct` annotations.
 
 ## [1.9.0] - 2023-02-14
 

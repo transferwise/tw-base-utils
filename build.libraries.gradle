@@ -4,6 +4,8 @@ ext {
     libraries = [
             // version defined
             awaitility            : "org.awaitility:awaitility:4.2.0",
+            jakartaValidationApi  : 'jakarta.validation:jakarta.validation-api:3.0.2',
+            javaxValidationApi    : "javax.validation:validation-api:2.0.1.Final",
             spockCore             : "org.spockframework:spock-core:2.3-groovy-4.0",
             springBootDependencies: "org.springframework.boot:spring-boot-dependencies:${springBootVersion}",
 

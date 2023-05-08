@@ -13,6 +13,8 @@ jobs:
     name: "Matrix Build"
     runs-on:
       - ubuntu-latest
+    container:
+      image: azul/zulu-openjdk:17
     strategy:
       fail-fast: false
       max-parallel: 100

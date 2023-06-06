@@ -3,7 +3,6 @@ package com.transferwise.common.baseutils.transactionsmanagement;
 import com.transferwise.common.baseutils.ExceptionUtils;
 import java.util.concurrent.Callable;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Isolation;
@@ -12,9 +11,11 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 @Slf4j
 public class TransactionsHelper implements ITransactionsHelper {
+  private final PlatformTransactionManager transactionManager;
 
-  @Autowired
-  private PlatformTransactionManager transactionManager;
+  public TransactionsHelper(PlatformTransactionManager transactionManager) {
+    this.transactionManager = transactionManager;
+  }
 
   @Override
   public boolean isRollbackOnly() {

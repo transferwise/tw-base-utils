@@ -20,6 +20,8 @@ ext {
             spotbugsAnnotations   : "com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}",
             springBootStarter     : "org.springframework.boot:spring-boot-starter",
             springTx              : "org.springframework:spring-tx",
+            jacksonDatabind       : "com.fasterxml.jackson.core:jackson-databind",
+            jacksonJsr310         : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
 
     ]
 }

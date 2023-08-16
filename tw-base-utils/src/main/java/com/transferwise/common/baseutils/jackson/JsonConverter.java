@@ -1,7 +1,6 @@
 package com.transferwise.common.baseutils.jackson;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-
 import java.util.List;
 
 public interface JsonConverter {

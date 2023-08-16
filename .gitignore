@@ -2,4 +2,8 @@
 build/
 out/
 
+# Idea IDE files
+*.iml
+*.ipr
+*.iws
 .idea

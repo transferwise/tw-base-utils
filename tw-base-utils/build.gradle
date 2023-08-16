@@ -15,6 +15,7 @@ dependencies {
     implementation libraries.slf4jApi
     implementation libraries.jacksonDatabind
     implementation libraries.jacksonJsr310
+    implementation libraries.jacksonJdk8
 
     testImplementation libraries.awaitility
     testImplementation libraries.guava

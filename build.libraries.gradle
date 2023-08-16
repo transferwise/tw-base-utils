@@ -21,7 +21,8 @@ ext {
             springBootStarter     : "org.springframework.boot:spring-boot-starter",
             springTx              : "org.springframework:spring-tx",
             jacksonDatabind       : "com.fasterxml.jackson.core:jackson-databind",
-            jacksonJsr310         : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+            jacksonJsr310         : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
+            jacksonJdk8           : "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
 
     ]
 }

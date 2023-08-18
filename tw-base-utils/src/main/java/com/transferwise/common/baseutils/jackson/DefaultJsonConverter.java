@@ -10,7 +10,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 
-final public class DefaultJsonConverter implements JsonConverter {
+public final class DefaultJsonConverter implements JsonConverter {
 
   private final ObjectMapper objectMapper;
 

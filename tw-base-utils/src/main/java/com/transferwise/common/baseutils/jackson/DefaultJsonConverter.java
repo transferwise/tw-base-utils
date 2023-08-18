@@ -9,8 +9,8 @@ import com.transferwise.common.baseutils.ExceptionUtils;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
-@Component
-final class DefaultJsonConverter implements JsonConverter {
+
+public final class DefaultJsonConverter implements JsonConverter {
 
   private final ObjectMapper objectMapper;
 

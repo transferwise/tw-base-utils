@@ -27,8 +27,8 @@ public class MeterCache implements IMeterCache {
 
   public MeterCache(MeterRegistry meterRegistry) {
     this.meterRegistry = meterRegistry;
-    this.counterCreaterFunction =  k -> meterRegistry.counter(k.getKey(), k.getValue().getMicrometerTags());
-    this.timerCreaterFunction =  k -> meterRegistry.timer(k.getKey(), k.getValue().getMicrometerTags());
+    this.counterCreaterFunction = k -> meterRegistry.counter(k.getKey(), k.getValue().getMicrometerTags());
+    this.timerCreaterFunction = k -> meterRegistry.timer(k.getKey(), k.getValue().getMicrometerTags());
   }
 
   @Override
@@ -83,8 +83,8 @@ public class MeterCache implements IMeterCache {
   }
 
   @Override
-  public DistributionSummary summary(String name, TagsSet tags, MeterCreator<DistributionSummary> meterCreator){
-    return (DistributionSummary) metersMap.computeIfAbsent(Pair.of(name, tags), k->meterCreator.create(k.getKey(), k.getValue()));
+  public DistributionSummary summary(String name, TagsSet tags, MeterCreator<DistributionSummary> meterCreator) {
+    return (DistributionSummary) metersMap.computeIfAbsent(Pair.of(name, tags), k -> meterCreator.create(k.getKey(), k.getValue()));
   }
 
   @Override
@@ -100,7 +100,7 @@ public class MeterCache implements IMeterCache {
 
   @Override
   public Timer timer(String name, TagsSet tags, MeterCreator<Timer> meterCreator) {
-    return (Timer)metersMap.computeIfAbsent(Pair.of(name, tags), k-> meterCreator.create(k.getKey(), k.getValue()));
+    return (Timer) metersMap.computeIfAbsent(Pair.of(name, tags), k -> meterCreator.create(k.getKey(), k.getValue()));
   }
 
   @Override
@@ -116,7 +116,7 @@ public class MeterCache implements IMeterCache {
 
   @Override
   public Counter counter(String name, TagsSet tags, MeterCreator<Counter> meterCreator) {
-    return (Counter)metersMap.computeIfAbsent(Pair.of(name, tags), k-> meterCreator.create(k.getKey(), k.getValue()));
+    return (Counter) metersMap.computeIfAbsent(Pair.of(name, tags), k -> meterCreator.create(k.getKey(), k.getValue()));
   }
 
   @Override

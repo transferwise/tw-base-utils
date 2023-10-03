@@ -70,11 +70,13 @@ public interface IMeterCache {
 
   MeterRegistry getMeterRegistry();
 
-  interface MeterCreator<M extends Meter>{
+  interface MeterCreator<M extends Meter> {
+
     M create(String name, TagsSet tags);
   }
 
   interface MeterContainerCreator<T> {
+
     T create(String name, TagsSet tags);
   }
 }

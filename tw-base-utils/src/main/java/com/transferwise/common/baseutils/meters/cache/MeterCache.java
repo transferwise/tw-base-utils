@@ -58,6 +58,7 @@ public class MeterCache implements IMeterCache {
   }
 
   @Override
+  @Deprecated(forRemoval = true)
   @SuppressWarnings("unchecked")
   public <T> T metersContainer(String name, TagsSet tags, Supplier<T> containerCreator) {
     return (T) metersContainersMap.computeIfAbsent(Pair.of(name, tags), k -> containerCreator.get());

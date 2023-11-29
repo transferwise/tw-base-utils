@@ -92,6 +92,15 @@ public class UuidUtils {
     return bytes;
   }
 
+  public static UUID add(UUID uuid, long constant){
+    if (uuid == null){
+      throw new NullPointerException("Can not add anything to null.");
+    }
+
+    // Can overflow, but this is fine.
+    return new UUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits() + constant);
+  }
+
   protected static long applyVersionBits(final long msb, int versionBits) {
     return (msb & 0xffffffffffff0fffL) | versionBits;
   }

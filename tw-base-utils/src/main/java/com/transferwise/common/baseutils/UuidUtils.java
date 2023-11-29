@@ -92,8 +92,8 @@ public class UuidUtils {
     return bytes;
   }
 
-  public static UUID add(UUID uuid, long constant){
-    if (uuid == null){
+  public static UUID add(UUID uuid, long constant) {
+    if (uuid == null) {
       throw new NullPointerException("Can not add anything to null.");
     }
 

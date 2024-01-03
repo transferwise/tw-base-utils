@@ -3,19 +3,23 @@ package com.transferwise.common.baseutils.concurrency;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.transferwise.common.baseutils.BaseTest;
 import com.transferwise.common.baseutils.clock.TestClock;
+import com.transferwise.common.baseutils.concurrency.ScheduledTaskExecutor.TaskHandle;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
@@ -208,6 +212,48 @@ public class SimpleScheduledTaskExecutorTest extends BaseTest {
     await().until(() -> results.containsKey(resultKey) && results.get(resultKey) == 1L && !taskHandle.isWorking());
 
     assertEquals(0, scheduledTaskExecutor.getTaskQueueSize());
+
+    scheduledTaskExecutor.stop();
+  }
+
+  /*
+    Covers a bug, where ScheduledTask's equals method was considering tasks with the same execution time as equals.
+
+    Stopping one task, stopped all other tasks with the same execution time as well.
+   */
+  @Test
+  public void testIfStoppingTasksWorksCorrectly() {
+    var testClock = new TestClock();
+    Map<Long, Boolean> results = new ConcurrentHashMap<>();
+
+    var executorService = Executors.newCachedThreadPool();
+    var scheduledTaskExecutor = new SimpleScheduledTaskExecutor("test", executorService).setTick(Duration.ofMillis(5))
+        .setClock(testClock);
+    scheduledTaskExecutor.start();
+
+    List<TaskHandle> taskHandleList = new ArrayList<>();
+    var finishedCount = new AtomicInteger();
+    for (int i = 0; i < 100; i++) {
+      long finalI = i;
+      taskHandleList.add(scheduledTaskExecutor.scheduleOnce(
+          () -> {
+            results.put(finalI, Boolean.TRUE);
+            finishedCount.incrementAndGet();
+          }, Duration.ofSeconds(1))
+      );
+    }
+
+    taskHandleList.get(50).stop();
+    testClock.tick(Duration.ofMillis(1001));
+
+    await().until(() -> finishedCount.get() == 99);
+
+    assertNull(results.get(50L));
+    for (long i = 0; i < 100; i++) {
+      if (i != 50) {
+        assertNotNull(results.get(i));
+      }
+    }
 
     scheduledTaskExecutor.stop();
   }

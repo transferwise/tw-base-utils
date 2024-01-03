@@ -22,7 +22,7 @@ public class DefaultExecutorServicesProvider implements IExecutorServicesProvide
     try {
       if (!initialized) {
         executorService = Executors.newCachedThreadPool(new CountingThreadFactory("tw-base"));
-        scheduledTaskExecutor = new SimpleScheduledTaskExecutor(null, executorService);
+        scheduledTaskExecutor = new SimpleScheduledTaskExecutor("gste", executorService);
         scheduledTaskExecutor.start();
         initialized = true;
       }

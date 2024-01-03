@@ -16,6 +16,7 @@ dependencies {
     implementation libraries.jacksonDatabind
     implementation libraries.jacksonJsr310
     implementation libraries.jacksonJdk8
+    implementation libraries.guava
 
     testImplementation libraries.awaitility
     testImplementation libraries.guava

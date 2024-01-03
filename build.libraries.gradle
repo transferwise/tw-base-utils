@@ -1,9 +1,10 @@
 ext {
-    springBootVersion = "${System.getenv("SPRING_BOOT_VERSION") ?: "2.6.15"}"
+    springBootVersion = "${System.getenv("SPRING_BOOT_VERSION") ?: "2.7.18"}"
 
     libraries = [
             // version defined
             awaitility            : "org.awaitility:awaitility:4.2.0",
+            guava                 : 'com.google.guava:guava:33.0.0-jre',
             jakartaValidationApi  : 'jakarta.validation:jakarta.validation-api:3.0.2',
             javaxValidationApi    : "javax.validation:validation-api:2.0.1.Final",
             spockCore             : "org.spockframework:spock-core:2.3-groovy-4.0",
@@ -11,7 +12,6 @@ ext {
 
             // versions managed by spring-boot-dependencies platform
             commonsLang3          : "org.apache.commons:commons-lang3",
-            guava                 : 'com.google.guava:guava:31.1-jre',
             junitJupiter          : "org.junit.jupiter:junit-jupiter",
             logbackClassic        : "ch.qos.logback:logback-classic",
             lombok                : "org.projectlombok:lombok",

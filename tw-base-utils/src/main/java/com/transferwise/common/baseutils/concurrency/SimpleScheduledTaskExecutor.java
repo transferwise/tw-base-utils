@@ -79,7 +79,16 @@ public class SimpleScheduledTaskExecutor implements ScheduledTaskExecutor {
 
     executorService.submit(() -> {
       while (!stopRequested) {
-        ScheduledTask scheduledTask = ExceptionUtils.doUnchecked(() -> taskQueue.poll(tick.toMillis(), TimeUnit.MILLISECONDS));
+        ScheduledTask scheduledTask = null;
+        try {
+          scheduledTask = taskQueue.poll(tick.toMillis(), TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+          if (stopRequested) {
+            break;
+          } else {
+            throw new RuntimeException(e);
+          }
+        }
         if (log.isDebugEnabled() && scheduledTask == null) {
           if (nextTaskLoggingRateLimiter.tryAcquire()) {
             var nextScheduledTask = taskQueue.peek();

@@ -2,13 +2,14 @@ package com.transferwise.common.baseutils.transactionsmanagement;
 
 import com.transferwise.common.baseutils.ExceptionUtils;
 import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 public class TransactionsHelper implements ITransactionsHelper {
@@ -39,6 +40,7 @@ public class TransactionsHelper implements ITransactionsHelper {
     private String name;
     private Isolation isolation;
     private Integer timeout;
+    private Predicate<Throwable> rollbackOnCondition;
 
     private Builder(PlatformTransactionManager transactionManager) {
       this.transactionManager = transactionManager;
@@ -92,14 +94,26 @@ public class TransactionsHelper implements ITransactionsHelper {
     }
 
     @Override
+    public IBuilder rollbackOn(Predicate<Throwable> predicate) {
+      this.rollbackOnCondition = predicate;
+      return this;
+    }
+
+    @Override
     public <T> T call(Callable<T> callable) {
       return ExceptionUtils.doUnchecked(() -> {
-        DefaultTransactionDefinition def =
-            propagation == null ? new DefaultTransactionDefinition() : new DefaultTransactionDefinition(propagation.value());
+        if (propagation == Propagation.REQUIRED && TransactionSynchronizationManager.isActualTransactionActive()) {
+          return callable.call();
+        }
+        WiseTransactionAttribute def =
+            propagation == null ? new WiseTransactionAttribute() : new WiseTransactionAttribute(propagation.value());
         def.setReadOnly(readOnly);
         def.setName(name);
         if (isolation != null) {
           def.setIsolationLevel(isolation.value());
+        }
+        if (rollbackOnCondition != null) {
+          def.setRollbackOnCondition(rollbackOnCondition);
         }
         if (timeout != null) {
           def.setTimeout(timeout);

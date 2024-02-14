@@ -1,6 +1,7 @@
 package com.transferwise.common.baseutils.transactionsmanagement;
 
 import com.transferwise.common.baseutils.ExceptionUtils;
+import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +10,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 public class TransactionsHelper implements ITransactionsHelper {
@@ -40,6 +40,7 @@ public class TransactionsHelper implements ITransactionsHelper {
     private String name;
     private Isolation isolation;
     private Integer timeout;
+    private boolean flag;
     private Predicate<Throwable> rollbackOnCondition;
 
     private Builder(PlatformTransactionManager transactionManager) {
@@ -94,17 +95,20 @@ public class TransactionsHelper implements ITransactionsHelper {
     }
 
     @Override
-    public IBuilder rollbackOn(Predicate<Throwable> predicate) {
-      this.rollbackOnCondition = predicate;
+    public IBuilder rollbackFor(Collection<Class<? extends Throwable>> exceptions) {
+      this.rollbackOnCondition = exceptions::contains;
+      return this;
+    }
+
+    @Override
+    public IBuilder noRollbackFor(Collection<Class<? extends Throwable>> exceptions) {
+      this.rollbackOnCondition = Predicate.not(exceptions::contains);
       return this;
     }
 
     @Override
     public <T> T call(Callable<T> callable) {
       return ExceptionUtils.doUnchecked(() -> {
-        if (propagation == Propagation.REQUIRED && TransactionSynchronizationManager.isActualTransactionActive()) {
-          return callable.call();
-        }
         WiseTransactionAttribute def =
             propagation == null ? new WiseTransactionAttribute() : new WiseTransactionAttribute(propagation.value());
         def.setReadOnly(readOnly);
@@ -124,10 +128,12 @@ public class TransactionsHelper implements ITransactionsHelper {
         try {
           result = callable.call();
         } catch (Throwable t) {
-          try {
-            transactionManager.rollback(status);
-          } catch (Throwable t2) {
-            log.error("Failed to rollback transaction '{}' ({}).", name != null ? name : "<no-txn-name>", def, t2);
+          if (rollbackOnCondition.test(t)) {
+            try {
+              transactionManager.rollback(status);
+            } catch (Throwable t2) {
+              log.error("Failed to rollback transaction '{}' ({}).", name != null ? name : "<no-txn-name>", def, t2);
+            }
           }
           throw t;
         }

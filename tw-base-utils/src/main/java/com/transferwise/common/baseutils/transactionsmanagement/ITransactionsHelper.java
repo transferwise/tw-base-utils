@@ -1,5 +1,6 @@
 package com.transferwise.common.baseutils.transactionsmanagement;
 
+import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 import org.springframework.transaction.annotation.Isolation;
@@ -34,7 +35,9 @@ public interface ITransactionsHelper {
 
     IBuilder withTimeout(Integer timeout);
 
-    IBuilder rollbackOn(Predicate<Throwable> condition);
+    IBuilder rollbackFor(Collection<Class<? extends Throwable>> exceptions);
+
+    IBuilder noRollbackFor(Collection<Class<? extends Throwable>> exceptions);
 
     <T> T call(Callable<T> callable);
 

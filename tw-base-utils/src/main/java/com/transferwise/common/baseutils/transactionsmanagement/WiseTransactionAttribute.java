@@ -1,10 +1,10 @@
 package com.transferwise.common.baseutils.transactionsmanagement;
 
+import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
-import java.util.function.Predicate;
 
 @Getter
 @Setter

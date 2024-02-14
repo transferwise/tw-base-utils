@@ -128,7 +128,7 @@ public class TransactionsHelper implements ITransactionsHelper {
         try {
           result = callable.call();
         } catch (Throwable t) {
-          if (rollbackOnCondition.test(t)) {
+          if (def.rollbackOn(t)) {
             try {
               transactionManager.rollback(status);
             } catch (Throwable t2) {

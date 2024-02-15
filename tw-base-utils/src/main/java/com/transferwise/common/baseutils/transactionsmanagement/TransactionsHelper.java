@@ -1,15 +1,14 @@
 package com.transferwise.common.baseutils.transactionsmanagement;
 
 import com.transferwise.common.baseutils.ExceptionUtils;
-import java.util.Collection;
 import java.util.concurrent.Callable;
-import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
 @Slf4j
 public class TransactionsHelper implements ITransactionsHelper {
@@ -40,8 +39,6 @@ public class TransactionsHelper implements ITransactionsHelper {
     private String name;
     private Isolation isolation;
     private Integer timeout;
-    private boolean flag;
-    private Predicate<Throwable> rollbackOnCondition;
 
     private Builder(PlatformTransactionManager transactionManager) {
       this.transactionManager = transactionManager;
@@ -95,40 +92,26 @@ public class TransactionsHelper implements ITransactionsHelper {
     }
 
     @Override
-    public IBuilder rollbackFor(Collection<Class<? extends Throwable>> exceptions) {
-      this.rollbackOnCondition = exceptions::contains;
-      return this;
-    }
-
-    @Override
-    public IBuilder noRollbackFor(Collection<Class<? extends Throwable>> exceptions) {
-      this.rollbackOnCondition = Predicate.not(exceptions::contains);
-      return this;
-    }
-
-    @Override
     public <T> T call(Callable<T> callable) {
       return ExceptionUtils.doUnchecked(() -> {
-        WiseTransactionAttribute def =
-            propagation == null ? new WiseTransactionAttribute() : new WiseTransactionAttribute(propagation.value());
+        DefaultTransactionAttribute def =
+            propagation == null ? new DefaultTransactionAttribute() : new DefaultTransactionAttribute(propagation.value());
         def.setReadOnly(readOnly);
         def.setName(name);
         if (isolation != null) {
           def.setIsolationLevel(isolation.value());
-        }
-        if (rollbackOnCondition != null) {
-          def.setRollbackOnCondition(rollbackOnCondition);
         }
         if (timeout != null) {
           def.setTimeout(timeout);
         }
 
         TransactionStatus status = transactionManager.getTransaction(def);
+        boolean newTransaction = status.isNewTransaction();
         T result;
         try {
           result = callable.call();
         } catch (Throwable t) {
-          if (def.rollbackOn(t)) {
+          if (newTransaction) {
             try {
               transactionManager.rollback(status);
             } catch (Throwable t2) {

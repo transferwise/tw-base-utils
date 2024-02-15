@@ -9,9 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* New option for the `TransactionHelper` where the rollback properties can be set.
-* Default logic for whitelist and blacklist is created for rollback.
-* Interception is not used if there is a transaction active and new transaction is not requested.
+* `TransactionHelper` only attempts to rollback if the transaction was created by the helper.
 
 ## [1.12.3] - 2024-01-11
 

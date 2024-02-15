@@ -8,7 +8,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 @Slf4j
 public class TransactionsHelper implements ITransactionsHelper {
@@ -94,8 +94,8 @@ public class TransactionsHelper implements ITransactionsHelper {
     @Override
     public <T> T call(Callable<T> callable) {
       return ExceptionUtils.doUnchecked(() -> {
-        DefaultTransactionAttribute def =
-            propagation == null ? new DefaultTransactionAttribute() : new DefaultTransactionAttribute(propagation.value());
+        DefaultTransactionDefinition def =
+            propagation == null ? new DefaultTransactionDefinition() : new DefaultTransactionDefinition(propagation.value());
         def.setReadOnly(readOnly);
         def.setName(name);
         if (isolation != null) {

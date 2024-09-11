@@ -5,12 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - 2024-09-11
+
+### Changed
+
+* Java 17+ is now required.
+
+### Added
+
+* Added ThreadUtils to take a fast inconsistent thread dump.
+
 ## [1.12.5] - 2024-07-16
 
 ### Changed
 
 * Added support for Spring Boot 3.3.
-
 
 ## [1.12.4] - 2024-02-22
 
@@ -64,7 +73,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Ported `JavaTimeModuleFactory` from old common lib so that the lib can be removed in the future. It provides consistent millisecond serialisation of `Instant` and `ZonedDateTime` objects.
+* Ported `JavaTimeModuleFactory` from old common lib so that the lib can be removed in the future. It provides consistent millisecond serialisation of
+  `Instant` and `ZonedDateTime` objects.
 
 ## [1.10.2] - 2023-07-28
 

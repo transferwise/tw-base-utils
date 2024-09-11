@@ -12,7 +12,7 @@ apply plugin: "java-library"
 apply plugin: "checkstyle"
 apply plugin: "idea"
 apply plugin: "com.github.spotbugs"
-apply plugin: "groovy"
+//apply plugin: "groovy"
 
 apply from: "$rootProject.rootDir/build.libraries.gradle"
 
@@ -62,8 +62,8 @@ java {
         targetCompatibility = JavaVersion.VERSION_17
     }
     else{
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     withSourcesJar()
     withJavadocJar()
@@ -92,7 +92,7 @@ compileTestJava {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
     javaCompiler = javaToolchains.compilerFor {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 
     options.fork = true
@@ -101,8 +101,10 @@ compileTestJava {
 
 test {
     javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
+
+    jvmArgs "-Xlog:safepoint=info"
 
     useJUnitPlatform()
 

@@ -26,33 +26,19 @@ jobs:
       SPRING_BOOT_VERSION: ${{ matrix.spring_boot_version }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-home-cache-cleanup: true
-          # Comment out when you are upgrading gradle in a branch and doing tons of commits you would need to test.
-          # cache-read-only: false
+        uses: gradle/actions/setup-gradle@v4
       - name: "Assemble jar"
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: assemble --console=plain --info --stacktrace --parallel
+        run: ./gradlew assemble --console=plain --info --stacktrace --parallel
       - name: "Compile tests"
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: compileTestJava compileTestGroovy --console=plain --info --stacktrace --parallel
+        run: ./gradlew compileTestJava compileTestGroovy --console=plain --info --stacktrace --parallel
       - name: "Run checks"
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: check -x test --console=plain --stacktrace
+        run: ./gradlew check -x test --console=plain --stacktrace
       - name: "Run tests"
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: -Dspring.profiles.include=continuous-integration test --console=plain --info --stacktrace
+        run: ./gradlew -Dspring.profiles.include=continuous-integration test --console=plain --info --stacktrace
       - name: "Test if publishing works"
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: publishToMavenLocal --console=plain --info --stacktrace
+        run: ./gradlew publishToMavenLocal --console=plain --info --stacktrace
       - name: "Publish Test Report"
         uses: mikepenz/action-junit-report@v3
         if: always()
@@ -78,7 +64,7 @@ jobs:
           tar -zcvf all-test-reports-${{ matrix.spring_boot_version }}.tar.gz **/build/reports
         if: always()
       - name: "Store test results"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: all-test-reports-${{ matrix.spring_boot_version }}
@@ -98,15 +84,9 @@ jobs:
         if: ${{ needs.matrix_build.result != 'success' }}
         run: exit 1
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-home-cache-cleanup: true
-          # Comment out when you are upgrading gradle in a branch and doing tons of commits you would need to test.
-          # cache-read-only: false
+        uses: gradle/actions/setup-gradle@v4
       - name: "Tag release"
         if: github.ref == 'refs/heads/master'
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: tagRelease --console=plain --info --stacktrace
+        run: ./gradlew tagRelease --console=plain --info --stacktrace

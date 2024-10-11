@@ -47,7 +47,8 @@ public class ThreadUtilsTest {
 
     for (var threadInfo : threadInfos) {
       var st = ThreadUtils.toString(threadInfo);
-      if (st.contains("at " + ThreadUtilsTest.class.getName())
+      if (st.contains("at ")
+          && st.contains(ThreadUtilsTest.class.getName())
           && st.contains("group=\"main\"")) {
         suitableThreadsFound++;
       }

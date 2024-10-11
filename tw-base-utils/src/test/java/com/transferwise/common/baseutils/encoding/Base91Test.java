@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -60,7 +61,7 @@ public class Base91Test {
     var n = 256;
     var result = new int[n];
     for (int i = 0; i < n; i++) {
-      result[i] = i;
+      result[i] = ThreadLocalRandom.current().nextInt();
     }
     return result;
   }

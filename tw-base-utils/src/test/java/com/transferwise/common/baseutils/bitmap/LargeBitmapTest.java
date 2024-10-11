@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Random;
 import java.util.TreeSet;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -159,7 +160,7 @@ public class LargeBitmapTest {
     final var n = 128;
     var result = new int[n];
     for (int i = 0; i < n; i++) {
-      result[i] = i;
+      result[i] = ThreadLocalRandom.current().nextInt();
     }
     return result;
   }
@@ -195,18 +196,26 @@ public class LargeBitmapTest {
       bits.remove(bit);
       bitmap.clear(bit);
 
-      assertThat(bits.first(), equalTo(bitmap.getFirstSetBit()));
-      assertThat(bits.last(), equalTo(bitmap.getFirstSetBit(bits.last())));
+      if (bits.isEmpty()) {
+        assertThat(bitmap.isEmpty(), equalTo(true));
+      } else {
+        assertThat(bits.first(), equalTo(bitmap.getFirstSetBit()));
+        assertThat(bits.last(), equalTo(bitmap.getFirstSetBit(bits.last())));
+      }
     }
 
-    var lastBit = bits.first() - 1;
-    for (var bit : bits) {
-      for (long i = lastBit + 1; i < bit; i++) {
-        assertThat(bitmap.isSet(i), equalTo(false));
-      }
-      assertThat(bitmap.isSet(bit), equalTo(true));
+    if (bits.isEmpty()) {
+      assertThat(bitmap.isEmpty(), equalTo(true));
+    } else {
+      var lastBit = bits.first() - 1;
+      for (var bit : bits) {
+        for (long i = lastBit + 1; i < bit; i++) {
+          assertThat(bitmap.isSet(i), equalTo(false));
+        }
+        assertThat(bitmap.isSet(bit), equalTo(true));
 
-      lastBit = bit;
+        lastBit = bit;
+      }
     }
   }
 

@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ public class LargeBitmapSerializerTest {
     var n = 128;
     var result = new int[n];
     for (int i = 0; i < n; i++) {
-      result[i] = i;
+      result[i] = ThreadLocalRandom.current().nextInt();
     }
     return result;
   }
@@ -69,7 +70,6 @@ public class LargeBitmapSerializerTest {
   @MethodSource("getSeeds")
   @SneakyThrows
   public void testRandomAtIntBoundary(int seed) {
-    seed = 5;
     var rnd = new Random(seed);
 
     var originalBitmap = new LargeBitmapImpl();

@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.transferwise.common.baseutils.ExceptionUtils;
 import java.util.List;
-import org.springframework.stereotype.Component;
 
 
 public final class DefaultJsonConverter implements JsonConverter {

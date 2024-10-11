@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.0] - 2024-10-11
+
+### Added
+
+* Base91 encoder.
+* RoaringBitmap based LargeBitmap with better 64 bits support.
+* ThreadUtils to take safe-point free thread dumps. Those thread dumps will be inconsistent, but still suitable in many cases.
+
 ## [1.13.0] - 2024-09-11
 
 ### Changed

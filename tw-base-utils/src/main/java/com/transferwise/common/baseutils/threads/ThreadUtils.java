@@ -1,13 +1,13 @@
-package com.transferwise.common.baseutils;
+package com.transferwise.common.baseutils.threads;
 
+import com.transferwise.common.baseutils.ExceptionUtils;
 import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import lombok.Data;
-import lombok.experimental.Accessors;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -18,7 +18,7 @@ public class ThreadUtils {
     sb.append("\"")
         .append(threadInfo.getName())
         .append("\"")
-        .append(" group=\"").append(threadInfo.groupName).append("\"")
+        .append(" group=\"").append(threadInfo.getGroupName()).append("\"")
         .append(" id=").append(threadInfo.getId())
         .append(" prio=").append(threadInfo.getPriority())
         .append(" daemon=").append(threadInfo.isDaemon())
@@ -52,9 +52,9 @@ public class ThreadUtils {
 
     try {
       return ExceptionUtils.doUnchecked(() -> {
-        ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+        var threadMxBean = ManagementFactory.getThreadMXBean();
 
-        var threads = org.apache.commons.lang3.ThreadUtils.getAllThreads();
+        var threads = org.apache.commons.lang3.ThreadUtils.findThreads((Predicate<Thread>) Objects::nonNull);
 
         var threadInfos = new ThreadInfo[threads.size()];
 
@@ -77,8 +77,8 @@ public class ThreadUtils {
                   .setState(thread.getState())
                   .setName(thread.getName())
                   .setPriority(thread.getPriority())
-                  .setCpuTime(threadMXBean.getThreadCpuTime(threadId))
-                  .setUserTime(threadMXBean.getThreadUserTime(threadId))
+                  .setCpuTime(threadMxBean.getThreadCpuTime(threadId))
+                  .setUserTime(threadMxBean.getThreadUserTime(threadId))
                   .setGroupName(thread.getThreadGroup().getName())
                   .setDaemon(thread.isDaemon());
 
@@ -104,19 +104,4 @@ public class ThreadUtils {
     }
   }
 
-  @Data
-  @Accessors(chain = true)
-  public static class ThreadInfo {
-
-    private Long id;
-    private long cpuTime;
-    private long userTime;
-    private Thread.State state;
-    private int priority;
-    private String name;
-    private String groupName;
-    private boolean daemon;
-
-    private StackTraceElement[] stackTrace;
-  }
 }

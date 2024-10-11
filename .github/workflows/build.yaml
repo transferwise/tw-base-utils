@@ -56,7 +56,7 @@ jobs:
           require_tests: true
       - name: Publish checkstyle report
         if: always()
-        uses: lcollins/checkstyle-github-action@v3
+        uses: lcollins/checkstyle-github-action@v3.1.0
         with:
           name: Checkstyle Report-(${{ matrix.spring_boot_version }})
           path: '**/build/reports/**/*.xml'

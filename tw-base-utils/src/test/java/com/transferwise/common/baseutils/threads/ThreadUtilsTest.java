@@ -3,6 +3,7 @@ package com.transferwise.common.baseutils.threads;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 import com.transferwise.common.baseutils.ExceptionUtils;
 import java.util.concurrent.Executors;
@@ -56,5 +57,11 @@ public class ThreadUtilsTest {
 
     // 1 is the test's thread itself
     assertThat(suitableThreadsFound, equalTo(threadsCount + 1));
+  }
+
+  @Test
+  @SneakyThrows
+  void takingThreadDumpWithCurrentThreadWorks() {
+    assertThat(ThreadUtils.getInconsistentThreadDump().length, greaterThan(0));
   }
 }

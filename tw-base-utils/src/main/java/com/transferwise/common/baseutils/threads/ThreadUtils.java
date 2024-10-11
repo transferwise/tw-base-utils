@@ -1,5 +1,6 @@
 package com.transferwise.common.baseutils.threads;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import com.transferwise.common.baseutils.ExceptionUtils;
 import java.lang.management.ManagementFactory;
 import java.util.Objects;
@@ -45,6 +46,10 @@ public class ThreadUtils {
       sb.append(toString(threadInfo));
     }
     return sb.toString();
+  }
+
+  public static ThreadInfo[] getInconsistentThreadDump() {
+    return getInconsistentThreadDump(MoreExecutors.newDirectExecutorService(), 1);
   }
 
   public static ThreadInfo[] getInconsistentThreadDump(ExecutorService executorService, int concurrency) {

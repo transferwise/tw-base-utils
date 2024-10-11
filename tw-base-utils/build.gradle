@@ -25,5 +25,4 @@ dependencies {
     testImplementation libraries.guava
     testImplementation libraries.junitJupiter
     testImplementation libraries.micrometerCore
-    testImplementation libraries.spockCore
 }

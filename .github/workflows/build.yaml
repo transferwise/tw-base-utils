@@ -32,7 +32,7 @@ jobs:
       - name: "Assemble jar"
         run: ./gradlew assemble --console=plain --info --stacktrace --parallel
       - name: "Compile tests"
-        run: ./gradlew compileTestJava compileTestGroovy --console=plain --info --stacktrace --parallel
+        run: ./gradlew compileTestJava --console=plain --info --stacktrace --parallel
       - name: "Run checks"
         run: ./gradlew check -x test --console=plain --stacktrace
       - name: "Run tests"

@@ -52,7 +52,6 @@ jobs:
         with:
           check_name: Test Report-(${{ matrix.spring_boot_version }})
           report_paths: '**/build/test-results/**/*.xml'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           require_tests: true
       - name: Publish checkstyle report
         if: always()

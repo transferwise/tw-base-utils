@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class JsonConverterTest {
+
   private JsonConverter jsonConverter;
   private Integer[] array = {1, 2};
 

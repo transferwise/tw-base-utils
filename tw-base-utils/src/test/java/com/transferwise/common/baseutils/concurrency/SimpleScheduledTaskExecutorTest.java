@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.common.base.Preconditions;
 import com.transferwise.common.baseutils.BaseTest;
 import com.transferwise.common.baseutils.clock.TestClock;
 import com.transferwise.common.baseutils.concurrency.ScheduledTaskExecutor.TaskHandle;
@@ -146,7 +147,7 @@ public class SimpleScheduledTaskExecutorTest extends BaseTest {
       return true;
     });
 
-    latch.await(1, TimeUnit.MINUTES);
+    Preconditions.checkState(latch.await(1, TimeUnit.MINUTES));
 
     await().until(() -> {
       testClock.tick(Duration.ofSeconds(1));

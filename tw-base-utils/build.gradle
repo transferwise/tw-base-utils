@@ -12,15 +12,17 @@ dependencies {
     compileOnly libraries.javaxValidationApi
 
     implementation libraries.commonsLang3
+    implementation libraries.commonsIo
     implementation libraries.slf4jApi
     implementation libraries.jacksonDatabind
     implementation libraries.jacksonJsr310
     implementation libraries.jacksonJdk8
     implementation libraries.guava
+    implementation libraries.roaringBitmap
+    implementation libraries.spotbugsAnnotations
 
     testImplementation libraries.awaitility
     testImplementation libraries.guava
     testImplementation libraries.junitJupiter
     testImplementation libraries.micrometerCore
-    testImplementation libraries.spockCore
 }

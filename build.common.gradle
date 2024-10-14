@@ -12,7 +12,6 @@ apply plugin: "java-library"
 apply plugin: "checkstyle"
 apply plugin: "idea"
 apply plugin: "com.github.spotbugs"
-apply plugin: "groovy"
 
 apply from: "$rootProject.rootDir/build.libraries.gradle"
 
@@ -57,14 +56,8 @@ dependencies {
 }
 
 java {
-    if (springBootVersion.startsWith("3.")) {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    else{
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
     withSourcesJar()
     withJavadocJar()
 }
@@ -89,20 +82,13 @@ compileJava {
 }
 
 compileTestJava {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-    javaCompiler = javaToolchains.compilerFor {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-
     options.fork = true
     options.forkOptions.jvmArgs << '-Xmx256m'
 }
 
 test {
-    javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
+    // To test ThreadUtils
+    // jvmArgs "-Xlog:safepoint=info"
 
     useJUnitPlatform()
 
@@ -116,8 +102,6 @@ test {
 }
 
 tasks.findAll { it.name.startsWith("spotbugs") }*.configure {
-    effort = "max"
-
     excludeFilter = file("$rootProject.rootDir/spotbugs-exclude.xml")
 
     reports {
@@ -126,11 +110,7 @@ tasks.findAll { it.name.startsWith("spotbugs") }*.configure {
     }
 }
 
-spotbugs {
-    spotbugsTest.enabled = false
-}
-
-tasks.withType(Checkstyle) {
+tasks.withType(Checkstyle).configureEach {
     config = resources.text.fromFile(file("$rootProject.rootDir/google_checks.xml"))
 
     // Deprecated, checkstyle does not like the namings.

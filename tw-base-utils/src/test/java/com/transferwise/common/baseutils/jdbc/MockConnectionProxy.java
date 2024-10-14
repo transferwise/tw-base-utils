@@ -1,5 +1,6 @@
 package com.transferwise.common.baseutils.jdbc;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -48,6 +49,7 @@ public class MockConnectionProxy implements ParentAwareConnectionProxy {
   }
 
   @Override
+  @SuppressFBWarnings("NP")
   public PreparedStatement prepareStatement(String sql) throws SQLException {
     return null;
   }

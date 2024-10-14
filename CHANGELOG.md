@@ -5,12 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - 2024-10-11
+
+### Added
+
+* Base91 encoder.
+* RoaringBitmap based LargeBitmap with better 64 bits support.
+* ThreadUtils to take safe-point free thread dumps. Those thread dumps will be inconsistent, but still suitable in many cases.
+
+### Changed
+
+* Java 17+ is now required.
+
 ## [1.12.5] - 2024-07-16
 
 ### Changed
 
 * Added support for Spring Boot 3.3.
-
 
 ## [1.12.4] - 2024-02-22
 
@@ -64,7 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Ported `JavaTimeModuleFactory` from old common lib so that the lib can be removed in the future. It provides consistent millisecond serialisation of `Instant` and `ZonedDateTime` objects.
+* Ported `JavaTimeModuleFactory` from old common lib so that the lib can be removed in the future. It provides consistent millisecond serialisation of
+  `Instant` and `ZonedDateTime` objects.
 
 ## [1.10.2] - 2023-07-28
 

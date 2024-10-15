@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 
 import com.transferwise.common.baseutils.ExceptionUtils;
+import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,6 +18,9 @@ public class ThreadUtilsTest {
   @Test
   @SneakyThrows
   void takingThreadDumpWorks() {
+    ProcessHandle processHandle = ProcessHandle.current();
+    long pid = processHandle.pid();
+    System.out.println("The PID of this Java process is: " + pid);
 
     var executorService = Executors.newCachedThreadPool();
 
@@ -62,6 +66,6 @@ public class ThreadUtilsTest {
   @Test
   @SneakyThrows
   void takingThreadDumpWithCurrentThreadWorks() {
-    assertThat(ThreadUtils.getInconsistentThreadDump().length, greaterThan(0));
+    assertThat(ThreadUtils.getInconsistentThreadDump().size(), greaterThan(0));
   }
 }

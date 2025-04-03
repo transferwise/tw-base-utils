@@ -39,6 +39,40 @@ public class UuidUtils {
   }
 
   /**
+   * UUID with 38 bit prefix based on provided timestamp.
+   *
+   * <p>Giving about 3181 days roll-over.
+   *
+   * <p>This UUID is not suitable for things like session and authentication tokens.
+   */
+  public static UUID generatePrefixCombUuid(long timestamp, UUID uuid) {
+    return generatePrefixCombUuid(timestamp, uuid, 38);
+  }
+
+  /**
+   * Generates time prefixed deterministic UUID.
+   *
+   * <p>Time will be truncated so that only given amount of bits will remain.
+   *
+   * <p>Rest of the bits in UUID are taken from provided UUID.
+   *
+   * <p>This UUID is not suitable for things like session and authentication tokens.
+   *
+   * @param timestamp provided timestamp.
+   * @param uuid provided uuid.
+   * @param timePrefixLengthBits technically we left-shift the current time-millis by that amount.
+   */
+  public static UUID generatePrefixCombUuid(long timestamp, UUID uuid, int timePrefixLengthBits) {
+    if (timePrefixLengthBits < 1 || timePrefixLengthBits > 63) {
+      throw new IllegalArgumentException("Prefix length " + timePrefixLengthBits + " has to be between 1 and 63, inclusively.");
+    }
+
+    long msb = (timestamp << (64 - timePrefixLengthBits)) | (uuid.getMostSignificantBits() & BIT_MASK[64 - timePrefixLengthBits]);
+    long lsb = uuid.getLeastSignificantBits();
+    return new UUID(applyVersionBits(msb, V4_VERSION_BITS), lsb);
+  }
+
+  /**
    * Generates time prefixed random UUID.
    *
    * <p>Time will be truncated so that only given amount of bits will remain.

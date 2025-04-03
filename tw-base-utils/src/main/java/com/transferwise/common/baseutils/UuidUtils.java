@@ -39,7 +39,7 @@ public class UuidUtils {
   }
 
   /**
-   * UUID with 38 bit prefix based on provided timestamp.
+   * UUID with 38 bit prefix based on provided timestamp milliseconds from epoch and uuid.
    *
    * <p>Giving about 3181 days roll-over.
    *
@@ -58,7 +58,7 @@ public class UuidUtils {
    *
    * <p>This UUID is not suitable for things like session and authentication tokens.
    *
-   * @param timestamp provided timestamp.
+   * @param timestamp provided timestamp milliseconds from epoch.
    * @param uuid provided uuid.
    * @param timePrefixLengthBits technically we left-shift the current time-millis by that amount.
    */

@@ -138,4 +138,5 @@ public class UuidUtils {
   protected static long applyVersionBits(final long msb, int versionBits) {
     return (msb & 0xffffffffffff0fffL) | versionBits;
   }
+
 }

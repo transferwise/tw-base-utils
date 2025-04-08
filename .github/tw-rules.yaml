@@ -1,1 +1,8 @@
 runChecks: true
+
+actions:
+  repo-settings:
+    deleteBranchOnMerge: true
+  sync-codeowners:
+    extraWriters:
+      - full-time-technical-staff

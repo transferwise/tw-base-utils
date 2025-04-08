@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.common.collect.Ordering;
 import com.transferwise.common.baseutils.clock.TestClock;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
@@ -110,6 +111,35 @@ class UuidUtilsTest extends BaseTest {
   @Test
   void generatingSecuredUuidWorks() {
     assertNotNull(UuidUtils.generateSecureUuid());
+  }
+
+  @Test
+  void deterministicPrefixCombUuidIsGrowingOverTimeWhilePreserveLestSignificantBits() {
+    int n = 100;
+    UUID uuid = UUID.randomUUID();
+    UUID[] uuids = new UUID[n];
+    Instant now = Instant.now();
+    for (int i = 0; i < n; i++) {
+      now = now.plus(Duration.ofMillis(2));
+      uuids[i] = UuidUtils.generatePrefixCombUuid(now.toEpochMilli(), uuid);
+    }
+
+    long previousTime = -1;
+    for (int i = 0; i < n; i++) {
+      long time = uuids[i].getMostSignificantBits() >>> (64 - 38);
+
+      if (previousTime != -1) {
+        assertTrue(previousTime < time);
+      }
+      previousTime = time;
+
+      System.out.println(uuids[i]);
+      assertEquals(4, uuids[i].version());
+      assertEquals(uuid.getLeastSignificantBits(), uuids[i].getLeastSignificantBits());
+    }
+
+    assertTrue(Ordering.natural().isOrdered(Arrays.asList(uuids)));
+    assertEquals(n, Set.of(uuids).size());
   }
 
 }

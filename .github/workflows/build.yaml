@@ -62,7 +62,7 @@ jobs:
           path: '**/build/reports/**/*.xml'
       - name: Publish spotbugs report
         if: always()
-        uses: lcollins/spotbugs-github-action@v3.1.0
+        uses: jwgmeligmeyling/spotbugs-github-action@master
         with:
           name: Spotbugs Report-(${{ matrix.spring_boot_version }})
           path: '**/build/reports/**/*.xml'

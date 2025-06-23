@@ -27,8 +27,8 @@ jobs:
       max-parallel: 100
       matrix:
         spring_boot_version:
-          - 3.4.0
-          - 3.3.1
+          - 3.4.6
+          - 3.5.0
 
     env:
       SPRING_BOOT_VERSION: ${{ matrix.spring_boot_version }}
@@ -62,7 +62,7 @@ jobs:
           path: '**/build/reports/**/*.xml'
       - name: Publish spotbugs report
         if: always()
-        uses: lcollins/spotbugs-github-action@v3.1.0
+        uses: jwgmeligmeyling/spotbugs-github-action@master
         with:
           name: Spotbugs Report-(${{ matrix.spring_boot_version }})
           path: '**/build/reports/**/*.xml'

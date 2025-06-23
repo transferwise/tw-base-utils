@@ -24,5 +24,6 @@ dependencies {
     testImplementation libraries.awaitility
     testImplementation libraries.guava
     testImplementation libraries.junitJupiter
+    testRuntimeOnly libraries.junitPlatformLauncher
     testImplementation libraries.micrometerCore
 }

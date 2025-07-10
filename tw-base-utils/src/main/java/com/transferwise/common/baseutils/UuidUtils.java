@@ -28,12 +28,56 @@ public class UuidUtils {
   }
 
   /**
+   * Timestamp-prefixed UUID for where UUIDs should be time-sortable, see <a href="https://uuid7.com/">uuid7.com</a> for details.
+   *
+   * <p>This UUID is not suitable for things like session and authentication tokens.
+   */
+  public static UUID generateUuidv7() {
+    long timestamp = ClockHolder.getClock().millis();
+    return generateUuidv7(timestamp);
+  }
+
+  /**
+   * Timestamp-prefixed UUID for where UUIDs should be time-sortable, see <a href="https://uuid7.com/">uuid7.com</a> for details.
+   *
+   * <p>This UUID is not suitable for things like session and authentication tokens.
+   *
+   * @param timestamp provided timestamp milliseconds from epoch.
+   */
+  public static UUID generateUuidv7(long timestamp) {
+    // use built-in implementation once https://bugs.openjdk.org/browse/JDK-8334015 is done and released
+    byte[] bytes = new byte[16];
+    numberGenerator.nextBytes(bytes);
+
+    // Embed the timestamp into the first 6 bytes
+    bytes[0] = (byte)(timestamp >>> 40);
+    bytes[1] = (byte)(timestamp >>> 32);
+    bytes[2] = (byte)(timestamp >>> 24);
+    bytes[3] = (byte)(timestamp >>> 16);
+    bytes[4] = (byte)(timestamp >>> 8);
+    bytes[5] = (byte)(timestamp);
+
+    // Set version to 7
+    bytes[6] &= 0x0f;
+    bytes[6] |= 0x70;
+
+    // Set variant to IETF
+    bytes[8] &= 0x3f;
+    bytes[8] |= (byte) 0x80;
+
+    return toUuid(bytes);
+  }
+
+  /**
    * Random UUID with 38 bit prefix based on current milliseconds from epoch.
    *
    * <p>Giving about 3181 days roll-over.
    *
    * <p>This UUID is not suitable for things like session and authentication tokens.
+   *
+   * @deprecated in a favour of {@link #generateUuidv7()}.
    */
+  @Deprecated(forRemoval = false)
   public static UUID generatePrefixCombUuid() {
     return generatePrefixCombUuid(38);
   }
@@ -44,7 +88,10 @@ public class UuidUtils {
    * <p>Giving about 3181 days roll-over.
    *
    * <p>This UUID is not suitable for things like session and authentication tokens.
+   *
+   * @deprecated in a favour of {@link #generateUuidv7()} and related methods. Note that we do not have an exact equivalent to this (yet).
    */
+  @Deprecated(forRemoval = false)
   public static UUID generatePrefixCombUuid(long timestamp, UUID uuid) {
     return generatePrefixCombUuid(timestamp, uuid, 38);
   }
@@ -61,7 +108,10 @@ public class UuidUtils {
    * @param timestamp provided timestamp milliseconds from epoch.
    * @param uuid provided uuid.
    * @param timePrefixLengthBits technically we left-shift the current time-millis by that amount.
+   *
+   * @deprecated in a favour of {@link #generateUuidv7()} and related methods. Note that we do not have an exact equivalent to this (yet).
    */
+  @Deprecated(forRemoval = false)
   public static UUID generatePrefixCombUuid(long timestamp, UUID uuid, int timePrefixLengthBits) {
     if (timePrefixLengthBits < 1 || timePrefixLengthBits > 63) {
       throw new IllegalArgumentException("Prefix length " + timePrefixLengthBits + " has to be between 1 and 63, inclusively.");
@@ -82,7 +132,10 @@ public class UuidUtils {
    * <p>This UUID is not suitable for things like session and authentication tokens.
    *
    * @param timePrefixLengthBits technically we left-shift the current time-millis by that amount.
+   *
+   * @deprecated in a favour of {@link #generateUuidv7()}. Note that UUIDv7s have a fixed 48-bit timestamp prefix.
    */
+  @Deprecated(forRemoval = false)
   public static UUID generatePrefixCombUuid(int timePrefixLengthBits) {
     if (timePrefixLengthBits < 1 || timePrefixLengthBits > 63) {
       throw new IllegalArgumentException("Prefix length " + timePrefixLengthBits + " has to be between 1 and 63, inclusively.");

@@ -8,8 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.14.0] - 2025-07-10
 
 ### Changed
-- Added support for generating [UUIDv7](https://uuid7.com/)s.
-- Deprecated prefix combined UUIDv4s in favour of UUIDv7.
+- Added support for generating [UUIDv7](https://uuid7.com/)s (`generateTimePrefixedUuid`).
+- Added support for generating UUIDv8s. This implementation (`generateDeterministicTimePrefixedUuid`) is a combination of UUIDv7's time-prefixing and UUIDv3's seeding.
+- Deprecated prefix combined UUIDv4s in favour of UUIDv7s or UUIDv8s (as appropriate).
 
 ## [1.13.4] - 2025-06-17
 

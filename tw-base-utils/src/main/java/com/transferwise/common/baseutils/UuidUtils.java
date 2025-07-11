@@ -32,9 +32,9 @@ public class UuidUtils {
    *
    * <p>This UUID is not suitable for things like session and authentication tokens.
    */
-  public static UUID generateUuidv7() {
+  public static UUID generateTimePrefixedUuid() {
     long timestamp = ClockHolder.getClock().millis();
-    return generateUuidv7(timestamp);
+    return generateTimePrefixedUuid(timestamp);
   }
 
   /**
@@ -44,27 +44,41 @@ public class UuidUtils {
    *
    * @param timestamp provided timestamp milliseconds from epoch.
    */
-  public static UUID generateUuidv7(long timestamp) {
+  public static UUID generateTimePrefixedUuid(long timestamp) {
     // use built-in implementation once https://bugs.openjdk.org/browse/JDK-8334015 is done and released
     byte[] bytes = new byte[16];
     numberGenerator.nextBytes(bytes);
+    applyV7StyleTimestampBits(timestamp, bytes);
+    applyVersionBits(7, bytes);
+    applyIetfVariantBits(bytes);
+    return toUuid(bytes);
+  }
 
-    // Embed the timestamp into the first 6 bytes
-    bytes[0] = (byte)(timestamp >>> 40);
-    bytes[1] = (byte)(timestamp >>> 32);
-    bytes[2] = (byte)(timestamp >>> 24);
-    bytes[3] = (byte)(timestamp >>> 16);
-    bytes[4] = (byte)(timestamp >>> 8);
-    bytes[5] = (byte)(timestamp);
+  /**
+   * Deterministic timestamp-prefixed UUID. This may be useful if <a href="https://transferwise.atlassian.net/wiki/spaces/EKB/pages/3184789016/Consistent+and+idempotent+processing+in+multi-step+flows#Branching-UUIDs">branching UUIDs</a> aren't a viable option.
+   *
+   * <p>This UUID is not suitable for things like session and authentication tokens.
+   *
+   * @param data a byte array that will be used to generate the UUID.
+   */
+  public static UUID generateDeterministicTimePrefixedUuid(byte[] data) {
+    long timestamp = ClockHolder.getClock().millis();
+    return generateDeterministicTimePrefixedUuid(timestamp, data);
+  }
 
-    // Set version to 7
-    bytes[6] &= 0x0f;
-    bytes[6] |= 0x70;
-
-    // Set variant to IETF
-    bytes[8] &= 0x3f;
-    bytes[8] |= (byte) 0x80;
-
+  /**
+   * Deterministic timestamp-prefixed UUID. This may be useful if <a href="https://transferwise.atlassian.net/wiki/spaces/EKB/pages/3184789016/Consistent+and+idempotent+processing+in+multi-step+flows#Branching-UUIDs">branching UUIDs</a> aren't a viable option.
+   *
+   * <p>This UUID is not suitable for things like session and authentication tokens.
+   *
+   * @param timestamp provided timestamp milliseconds from epoch.
+   * @param data a byte array that will be used to generate the UUID.
+   */
+  public static UUID generateDeterministicTimePrefixedUuid(long timestamp, byte[] data) {
+    byte[] bytes = toBytes(UUID.nameUUIDFromBytes(data));
+    applyV7StyleTimestampBits(timestamp, bytes);
+    applyVersionBits(8, bytes);
+    applyIetfVariantBits(bytes);
     return toUuid(bytes);
   }
 
@@ -75,7 +89,7 @@ public class UuidUtils {
    *
    * <p>This UUID is not suitable for things like session and authentication tokens.
    *
-   * @deprecated in a favour of {@link #generateUuidv7()}.
+   * @deprecated in a favour of {@link #generateTimePrefixedUuid()}.
    */
   @Deprecated(forRemoval = false)
   public static UUID generatePrefixCombUuid() {
@@ -89,7 +103,7 @@ public class UuidUtils {
    *
    * <p>This UUID is not suitable for things like session and authentication tokens.
    *
-   * @deprecated in a favour of {@link #generateUuidv7()} and related methods. Note that we do not have an exact equivalent to this (yet).
+   * @deprecated in a favour of {@link #generateDeterministicTimePrefixedUuid(long timestamp, byte[] data)}.
    */
   @Deprecated(forRemoval = false)
   public static UUID generatePrefixCombUuid(long timestamp, UUID uuid) {
@@ -109,7 +123,7 @@ public class UuidUtils {
    * @param uuid provided uuid.
    * @param timePrefixLengthBits technically we left-shift the current time-millis by that amount.
    *
-   * @deprecated in a favour of {@link #generateUuidv7()} and related methods. Note that we do not have an exact equivalent to this (yet).
+   * @deprecated in a favour of {@link #generateTimePrefixedUuid()} and related methods. Note that we do not have an exact equivalent to this (yet).
    */
   @Deprecated(forRemoval = false)
   public static UUID generatePrefixCombUuid(long timestamp, UUID uuid, int timePrefixLengthBits) {
@@ -133,7 +147,7 @@ public class UuidUtils {
    *
    * @param timePrefixLengthBits technically we left-shift the current time-millis by that amount.
    *
-   * @deprecated in a favour of {@link #generateUuidv7()}. Note that UUIDv7s have a fixed 48-bit timestamp prefix.
+   * @deprecated in a favour of {@link #generateTimePrefixedUuid()}. Note that UUIDv7s have a fixed 48-bit timestamp prefix.
    */
   @Deprecated(forRemoval = false)
   public static UUID generatePrefixCombUuid(int timePrefixLengthBits) {
@@ -188,8 +202,29 @@ public class UuidUtils {
     return new UUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits() + constant);
   }
 
+  protected static void applyV7StyleTimestampBits(long timestamp, byte[] bytes) {
+    bytes[0] = (byte)(timestamp >>> 40);
+    bytes[1] = (byte)(timestamp >>> 32);
+    bytes[2] = (byte)(timestamp >>> 24);
+    bytes[3] = (byte)(timestamp >>> 16);
+    bytes[4] = (byte)(timestamp >>> 8);
+    bytes[5] = (byte)(timestamp);
+  }
+
   protected static long applyVersionBits(final long msb, int versionBits) {
     return (msb & 0xffffffffffff0fffL) | versionBits;
+  }
+
+  protected static void applyVersionBits(int version, byte[] bytes) {
+    // Set version bits
+    bytes[6] &= 0x0f;
+    bytes[6] |= (byte) (version << 4);
+  }
+
+  protected static void applyIetfVariantBits(byte[] bytes) {
+    // Set variant to IETF
+    bytes[8] &= 0x3f;
+    bytes[8] |= (byte) 0x80;
   }
 
 }

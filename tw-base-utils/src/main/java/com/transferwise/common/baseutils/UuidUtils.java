@@ -123,7 +123,8 @@ public class UuidUtils {
    * @param uuid provided uuid.
    * @param timePrefixLengthBits technically we left-shift the current time-millis by that amount.
    *
-   * @deprecated in a favour of {@link #generateTimePrefixedUuid()} and related methods. Note that we do not have an exact equivalent to this (yet).
+   * @deprecated in a favour of {@link #generateDeterministicTimePrefixedUuid(long timestamp, byte[] data)}.
+   *     Note that the replacement method has a fixed 48-bit timestamp prefix.
    */
   @Deprecated(forRemoval = false)
   public static UUID generatePrefixCombUuid(long timestamp, UUID uuid, int timePrefixLengthBits) {
@@ -202,7 +203,7 @@ public class UuidUtils {
     return new UUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits() + constant);
   }
 
-  protected static void applyV7StyleTimestampBits(long timestamp, byte[] bytes) {
+  private static void applyV7StyleTimestampBits(long timestamp, byte[] bytes) {
     bytes[0] = (byte)(timestamp >>> 40);
     bytes[1] = (byte)(timestamp >>> 32);
     bytes[2] = (byte)(timestamp >>> 24);
@@ -211,17 +212,17 @@ public class UuidUtils {
     bytes[5] = (byte)(timestamp);
   }
 
-  protected static long applyVersionBits(final long msb, int versionBits) {
+  private static long applyVersionBits(final long msb, int versionBits) {
     return (msb & 0xffffffffffff0fffL) | versionBits;
   }
 
-  protected static void applyVersionBits(int version, byte[] bytes) {
+  private static void applyVersionBits(int version, byte[] bytes) {
     // Set version bits
     bytes[6] &= 0x0f;
     bytes[6] |= (byte) (version << 4);
   }
 
-  protected static void applyIetfVariantBits(byte[] bytes) {
+  private static void applyIetfVariantBits(byte[] bytes) {
     // Set variant to IETF
     bytes[8] &= 0x3f;
     bytes[8] |= (byte) 0x80;

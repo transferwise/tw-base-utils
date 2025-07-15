@@ -144,7 +144,36 @@ class UuidUtilsTest extends BaseTest {
   }
 
   @Test
-  void addingConstantDoesNotChangeOrdering() {
+  void addingConstantDoesNotChangeOrderingOfPrefixCombUuid() {
+    TestClock clock = TestClock.createAndRegister();
+
+    int n = 100;
+
+    UUID[] uuids = new UUID[n];
+    for (int i = 0; i < n; i++) {
+      uuids[i] = UuidUtils.add(UuidUtils.generatePrefixCombUuid(), ThreadLocalRandom.current().nextInt());
+      clock.tick(Duration.ofMillis(2));
+    }
+
+    long previousTime = -1;
+    for (int i = 0; i < n; i++) {
+      long time = uuids[i].getMostSignificantBits() >>> (64 - 48);
+
+      if (previousTime != -1) {
+        assertTrue(previousTime < time);
+      }
+      previousTime = time;
+
+      System.out.println(uuids[i]);
+      assertEquals(4, uuids[i].version());
+    }
+
+    assertTrue(Ordering.natural().isOrdered(Arrays.asList(uuids)));
+    assertEquals(n, Set.of(uuids).size());
+  }
+
+  @Test
+  void addingConstantDoesNotChangeOrderingOfTimePrefixedUuid() {
     TestClock clock = TestClock.createAndRegister();
 
     int n = 100;

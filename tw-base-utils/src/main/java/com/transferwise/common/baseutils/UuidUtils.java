@@ -31,6 +31,8 @@ public class UuidUtils {
    * Timestamp-prefixed UUID for where UUIDs should be time-sortable, see <a href="https://uuid7.com/">uuid7.com</a> for details.
    *
    * <p>This UUID is not suitable for things like session and authentication tokens.
+   *
+   * <p>This method is likely to be deprecated once <a href="https://bugs.openjdk.org/browse/JDK-8334015">JDK-8334015</a> has been released, in favour of the built-in UUIDv7 implementation.
    */
   public static UUID generateTimePrefixedUuid() {
     long timestamp = ClockHolder.getClock().millis();
@@ -41,6 +43,8 @@ public class UuidUtils {
    * Timestamp-prefixed UUID for where UUIDs should be time-sortable, see <a href="https://uuid7.com/">uuid7.com</a> for details.
    *
    * <p>This UUID is not suitable for things like session and authentication tokens.
+   *
+   * <p>This method is likely to be deprecated once <a href="https://bugs.openjdk.org/browse/JDK-8334015">JDK-8334015</a> has been released, in favour of the built-in UUIDv7 implementation.
    *
    * @param timestamp provided timestamp milliseconds from epoch.
    */

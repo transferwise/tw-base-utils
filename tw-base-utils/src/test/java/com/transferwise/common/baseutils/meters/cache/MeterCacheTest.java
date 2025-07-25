@@ -59,13 +59,14 @@ class MeterCacheTest {
     final var tag2 = Tag.of("tag2", "tagValue2");
     final var counterName = "my.test.counter";
 
-    var counter0 = meterCache.counter(counterName, TagsSet.of(tag0, tag1));
-    var counter1 = meterCache.counter(counterName, TagsSet.of(tag0, tag1));
+    // Notice the reverse order of tags, so that micrometer will be reordering them.
+    var counter0 = meterCache.counter(counterName, TagsSet.of(tag1, tag0));
+    var counter1 = meterCache.counter(counterName, TagsSet.of(tag1, tag0));
 
     assertSame(counter0, counter1);
     assertEquals(1, meterCache.size());
 
-    var counter2 = meterCache.counter(counterName, TagsSet.of(tag1, tag0));
+    var counter2 = meterCache.counter(counterName, TagsSet.of(tag0, tag1));
     //Even when cache is different, the underlying meterRegistry provides same counter.
     assertSame(counter0, counter2);
     assertEquals(2, meterCache.size());

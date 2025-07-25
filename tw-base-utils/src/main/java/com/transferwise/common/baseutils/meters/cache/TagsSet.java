@@ -61,9 +61,10 @@ public abstract class TagsSet {
       return Arrays.equals(this.tags, ((ArrayTagsSet) other).tags);
     }
 
+    // Cloning is necessary to avoid Micrometer sorting our own array, making equals method flaky.
     @Override
     public Tags getMicrometerTags() {
-      return Tags.of(tags);
+      return Tags.of(Arrays.copyOf(tags, tags.length));
     }
   }
 

@@ -1,11 +1,11 @@
 ext {
-    springBootVersion = "${System.getenv("SPRING_BOOT_VERSION") ?: "3.2.2"}"
+    springBootVersion = "${System.getenv("SPRING_BOOT_VERSION") ?: "3.4.8"}"
 
     libraries = [
             // version defined
-            awaitility            : "org.awaitility:awaitility:4.2.2",
-            commonsIo             : "commons-io:commons-io:2.17.0",
-            guava                 : 'com.google.guava:guava:33.3.1-jre',
+            awaitility            : "org.awaitility:awaitility:4.3.0",
+            commonsIo             : "commons-io:commons-io:2.20.0",
+            guava                 : 'com.google.guava:guava:33.4.0-jre',
             jakartaValidationApi  : 'jakarta.validation:jakarta.validation-api:3.0.2',
             javaxValidationApi    : "javax.validation:validation-api:2.0.1.Final",
             roaringBitmap         : 'org.roaringbitmap:RoaringBitmap:1.3.0',

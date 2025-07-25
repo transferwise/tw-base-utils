@@ -172,7 +172,7 @@ public class LargeBitmapTest {
     var bits = new TreeSet<Long>();
     var rnd = new Random(seed);
 
-    long range = rnd.nextLong(10000);
+    long range = rnd.nextLong(2, 10000);
     long origin = INT_SIZE - range / 2;
     long bound = INT_SIZE + range / 2;
     long iterations = rnd.nextLong(1000);
